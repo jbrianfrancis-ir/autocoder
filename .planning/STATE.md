@@ -3,11 +3,11 @@
 ## Current Position
 
 Phase: 1 of 5 (Spec-Driven Architecture)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-10 - Completed 01-01-PLAN.md (Spec Format & Parser)
+Last activity: 2026-01-10 - Completed 01-02-PLAN.md (Initializer Spec Generation)
 
-Progress: ██░░░░░░░░ 7%
+Progress: ███░░░░░░░ 13%
 
 ## Accumulated Context
 
@@ -18,12 +18,19 @@ Progress: ██░░░░░░░░ 7%
 | 01-01 | YAML frontmatter over JSON | More human-readable, aligns with Ralph Wiggum's "markdown over JSON" principle |
 | 01-01 | Test Steps → steps array | Direct mapping to existing Feature model structure |
 | 01-01 | No external YAML parser | Simple inline parsing keeps dependencies minimal |
+| 01-02 | Numbered prefixes (01-, 02-) for spec priority | Natural sort order, simpler than frontmatter-only |
+| 01-02 | AGENTS.md under 60 lines | Ralph Wiggum guidance for quick parsing |
+| 01-02 | Hybrid database approach | Keep feature_create_bulk for runtime tracking |
 
 ### Patterns Established
 
 From 01-01:
 - Spec format: YAML frontmatter + H1 title + description + criteria + steps
 - Parser uses standard library only (no new dependencies)
+
+From 01-02:
+- Spec file naming: `specs/{NN}-{feature-name}.md`
+- AGENTS.md as operational quick reference (<60 lines)
 
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
@@ -48,7 +55,7 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-10
-Stopped at: Completed 01-01-PLAN.md
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
 
 ## Phase Dependencies
