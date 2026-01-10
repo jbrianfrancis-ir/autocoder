@@ -3,19 +3,27 @@
 ## Current Position
 
 Phase: 1 of 5 (Spec-Driven Architecture)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-10 - Milestone v1.0 Ralph Wiggum Alignment created
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-10 - Completed 01-01-PLAN.md (Spec Format & Parser)
 
-Progress: ░░░░░░░░░░ 0%
+Progress: ██░░░░░░░░ 7%
 
 ## Accumulated Context
 
 ### Key Decisions Made
 
-None yet - milestone just initialized.
+| Phase | Decision | Rationale |
+|-------|----------|-----------|
+| 01-01 | YAML frontmatter over JSON | More human-readable, aligns with Ralph Wiggum's "markdown over JSON" principle |
+| 01-01 | Test Steps → steps array | Direct mapping to existing Feature model structure |
+| 01-01 | No external YAML parser | Simple inline parsing keeps dependencies minimal |
 
 ### Patterns Established
+
+From 01-01:
+- Spec format: YAML frontmatter + H1 title + description + criteria + steps
+- Parser uses standard library only (no new dependencies)
 
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
@@ -40,7 +48,7 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-10
-Stopped at: Milestone v1.0 initialization
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
 
 ## Phase Dependencies
