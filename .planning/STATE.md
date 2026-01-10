@@ -3,11 +3,11 @@
 ## Current Position
 
 Phase: 2 of 5 (Deterministic Loop)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-10 - Completed 02-01-PLAN.md (Analysis & Design)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-10 - Completed 02-02-PLAN.md (Implementation)
 
-Progress: █████░░░░░ 40%
+Progress: ██████░░░░ 50%
 
 ## Accumulated Context
 
@@ -15,6 +15,8 @@ Progress: █████░░░░░ 40%
 
 | Phase | Decision | Rationale |
 |-------|----------|-----------|
+| 02-02 | Selective grep for section reading | Avoids full file read, maintains determinism |
+| 02-02 | Session Log marked "do not read" | Prevents unstructured prose from confusing agent |
 | 02-01 | structure-progress for claude-progress.txt | Balances determinism with human observability, enables selective reading |
 | 01-01 | YAML frontmatter over JSON | More human-readable, aligns with Ralph Wiggum's "markdown over JSON" principle |
 | 01-01 | Test Steps → steps array | Direct mapping to existing Feature model structure |
@@ -41,6 +43,11 @@ From 01-03:
 - Auto-load specs on startup if database empty
 - feature_sync_from_specs for manual spec edits
 
+From 02-02:
+- Structured claude-progress.txt: Session Log, Known Issues, Blocked Features, Next Session
+- Selective reading via grep for structured sections only
+- Session Architecture section in AGENTS.md template
+
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
 - Feature MCP server for agent-database communication
@@ -64,8 +71,8 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-10
-Stopped at: Completed 02-01-PLAN.md (Analysis & Design)
-Resume file: .planning/phases/02-deterministic-loop/02-02-PLAN.md
+Stopped at: Completed 02-02-PLAN.md (Implementation) - Phase 2 complete
+Resume file: None (ready for Phase 3 planning)
 
 ## Phase Dependencies
 
@@ -97,4 +104,4 @@ Phase 5 (Sandbox Hardening)
 
 ---
 
-*State updated: 2026-01-10 - Phase 1 Complete*
+*State updated: 2026-01-10 - Phase 2 Complete*
