@@ -14,28 +14,49 @@ pwd
 # 2. List files to understand project structure
 ls -la
 
-# 3. Read the project specification to understand what you're building
-cat app_spec.txt
+# 3. Read the operational reference for quick build/run commands
+cat AGENTS.md
 
-# 4. Read progress notes from previous sessions
+# 4. List available specs (feature requirements)
+ls specs/
+
+# 5. Read progress notes from previous sessions
 cat claude-progress.txt
 
-# 5. Check recent git history
+# 6. Check recent git history
 git log --oneline -20
 ```
 
 Then use MCP tools to check feature status:
 
 ```
-# 6. Get progress statistics (passing/total counts)
+# 7. Get progress statistics (passing/total counts)
 Use the feature_get_stats tool
 
-# 7. Get the next feature to work on
+# 8. Get the next feature to work on
 Use the feature_get_next tool
 ```
 
-Understanding the `app_spec.txt` is critical - it contains the full requirements
-for the application you're building.
+**AGENTS.md** contains quick-start commands for building and running the project.
+**specs/** contains authoritative feature specifications - one markdown file per feature.
+
+### UNDERSTANDING SPECS
+
+The project uses a **specs-first** pattern:
+
+- **specs/** directory contains one markdown file per feature
+- Each spec file has frontmatter (category, priority) and acceptance criteria
+- **Database** tracks completion status (passes, in_progress)
+- When `feature_get_next` returns, it includes `spec_filepath` pointing to the full spec
+
+**Read the spec file for full requirements:**
+
+```bash
+# After getting next feature, read its spec for complete details
+cat specs/01-user-login.md
+```
+
+The spec file is authoritative for WHAT to build. The database tracks PROGRESS.
 
 ### STEP 2: START SERVERS (IF NOT RUNNING)
 
@@ -100,6 +121,18 @@ Get the next feature to implement:
 # Get the highest-priority pending feature
 Use the feature_get_next tool
 ```
+
+**The response includes `spec_filepath`** - read the full spec file for detailed requirements:
+
+```bash
+# Read the spec file for complete acceptance criteria
+cat <spec_filepath from feature_get_next response>
+```
+
+The database may have a summary description, but the **spec file has full details** including:
+- Acceptance criteria (what "done" looks like)
+- Test steps (how to verify it works)
+- Edge cases and error handling requirements
 
 Once you've retrieved the feature, **immediately mark it as in-progress**:
 
