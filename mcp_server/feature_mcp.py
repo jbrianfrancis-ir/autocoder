@@ -33,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from api.database import Feature, create_database
 from api.migration import migrate_json_to_sqlite
+from spec_parser import parse_specs_directory, spec_to_feature_dict
 
 # Configuration from environment
 PROJECT_DIR = Path(os.environ.get("PROJECT_DIR", ".")).resolve()
@@ -96,6 +97,32 @@ async def server_lifespan(server: FastMCP):
     # Run migration if needed (converts legacy JSON to SQLite)
     migrate_json_to_sqlite(PROJECT_DIR, _session_maker)
 
+    # Load specs if specs/ directory exists and database is empty
+    specs_dir = PROJECT_DIR / "specs"
+    if specs_dir.exists():
+        session = _session_maker()
+        try:
+            feature_count = session.query(Feature).count()
+            if feature_count == 0:
+                # Database is empty, load from specs
+                specs = parse_specs_directory(specs_dir)
+                for spec in specs:
+                    feature_dict = spec_to_feature_dict(spec)
+                    feature_dict["spec_filepath"] = spec["filepath"]
+                    db_feature = Feature(
+                        priority=feature_dict["priority"],
+                        category=feature_dict["category"],
+                        name=feature_dict["name"],
+                        description=feature_dict["description"],
+                        steps=feature_dict["steps"],
+                        passes=feature_dict["passes"],
+                        in_progress=feature_dict["in_progress"],
+                    )
+                    session.add(db_feature)
+                session.commit()
+        finally:
+            session.close()
+
     yield
 
     # Cleanup
@@ -148,9 +175,13 @@ def feature_get_next() -> str:
     Returns the feature with the lowest priority number that has passes=false.
     Use this at the start of each coding session to determine what to implement next.
 
+    If specs/ directory exists, also includes spec_filepath pointing to the
+    authoritative spec file. The spec file contains full acceptance criteria
+    and detailed requirements.
+
     Returns:
         JSON with feature details (id, priority, category, name, description, steps, passes, in_progress)
-        or error message if all features are passing.
+        plus spec_filepath if specs/ exists. Returns error message if all features are passing.
     """
     session = get_session()
     try:
@@ -164,7 +195,22 @@ def feature_get_next() -> str:
         if feature is None:
             return json.dumps({"error": "All features are passing! No more work to do."})
 
-        return json.dumps(feature.to_dict(), indent=2)
+        result = feature.to_dict()
+
+        # Check for matching spec file
+        specs_dir = PROJECT_DIR / "specs"
+        if specs_dir.exists():
+            # Find spec by matching name
+            specs = parse_specs_directory(specs_dir)
+            for spec in specs:
+                if spec["name"] == feature.name:
+                    result["spec_filepath"] = spec["filepath"]
+                    # Include full spec content for reference
+                    result["spec_description"] = spec["description"]
+                    result["spec_steps"] = spec["steps"]
+                    break
+
+        return json.dumps(result, indent=2)
     finally:
         session.close()
 
@@ -406,6 +452,87 @@ def feature_create_bulk(
         session.commit()
 
         return json.dumps({"created": created_count}, indent=2)
+    except Exception as e:
+        session.rollback()
+        return json.dumps({"error": str(e)})
+    finally:
+        session.close()
+
+
+@mcp.tool()
+def feature_sync_from_specs() -> str:
+    """Sync features from specs/ directory to database.
+
+    Re-parses the specs/ directory and updates the database:
+    - New specs are added as new features
+    - Existing features (matched by name) have content updated but preserve status
+    - Specs not in directory are NOT deleted (preserves manual features)
+
+    Use this after adding or modifying spec files to update the feature list
+    without losing progress on already-passing features.
+
+    Returns:
+        JSON with: added (int), updated (int), unchanged (int), total_specs (int)
+    """
+    specs_dir = PROJECT_DIR / "specs"
+    if not specs_dir.exists():
+        return json.dumps({
+            "error": "No specs/ directory found. Create specs/ with markdown spec files first."
+        })
+
+    session = get_session()
+    try:
+        specs = parse_specs_directory(specs_dir)
+
+        added = 0
+        updated = 0
+        unchanged = 0
+
+        for spec in specs:
+            feature_dict = spec_to_feature_dict(spec)
+
+            # Try to find existing feature by name
+            existing = session.query(Feature).filter(Feature.name == spec["name"]).first()
+
+            if existing:
+                # Update content but preserve status (passes, in_progress)
+                content_changed = (
+                    existing.category != feature_dict["category"]
+                    or existing.description != feature_dict["description"]
+                    or existing.steps != feature_dict["steps"]
+                )
+
+                if content_changed:
+                    existing.category = feature_dict["category"]
+                    existing.description = feature_dict["description"]
+                    existing.steps = feature_dict["steps"]
+                    # Note: priority from spec may differ; update if spec is authoritative
+                    existing.priority = feature_dict["priority"]
+                    updated += 1
+                else:
+                    unchanged += 1
+            else:
+                # New feature from spec
+                db_feature = Feature(
+                    priority=feature_dict["priority"],
+                    category=feature_dict["category"],
+                    name=feature_dict["name"],
+                    description=feature_dict["description"],
+                    steps=feature_dict["steps"],
+                    passes=feature_dict["passes"],
+                    in_progress=feature_dict["in_progress"],
+                )
+                session.add(db_feature)
+                added += 1
+
+        session.commit()
+
+        return json.dumps({
+            "added": added,
+            "updated": updated,
+            "unchanged": unchanged,
+            "total_specs": len(specs)
+        }, indent=2)
     except Exception as e:
         session.rollback()
         return json.dumps({"error": str(e)})
