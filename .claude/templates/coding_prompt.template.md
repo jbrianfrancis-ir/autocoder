@@ -20,20 +20,32 @@ cat AGENTS.md
 # 4. List available specs (feature requirements)
 ls specs/
 
-# 5. Read progress notes from previous sessions
-cat claude-progress.txt
-
-# 6. Check recent git history
+# 5. Check recent git history
 git log --oneline -20
 ```
+
+**Read structured progress sections (if the file exists):**
+
+```bash
+# 6. Read known issues (structured section only)
+grep -A 50 "^## Known Issues" claude-progress.txt 2>/dev/null | grep -B 1 -A 50 "^##" | head -50
+
+# 7. Read blocked features (structured section only)
+grep -A 50 "^## Blocked Features" claude-progress.txt 2>/dev/null | grep -B 1 -A 50 "^##" | head -50
+
+# 8. Read next session notes (structured section only)
+grep -A 50 "^## Next Session" claude-progress.txt 2>/dev/null | grep -B 1 -A 50 "^##" | head -50
+```
+
+**Note:** The `## Session Log` section is for human debugging only. Do NOT read it - it contains unstructured prose from prior sessions that may confuse your fresh context.
 
 Then use MCP tools to check feature status:
 
 ```
-# 7. Get progress statistics (passing/total counts)
+# 9. Get progress statistics (passing/total counts)
 Use the feature_get_stats tool
 
-# 8. Get the next feature to work on
+# 10. Get the next feature to work on
 Use the feature_get_next tool
 ```
 
@@ -171,7 +183,7 @@ If you must skip (truly external blocker only):
 Use the feature_skip tool with feature_id={id}
 ```
 
-Document the SPECIFIC external blocker in `claude-progress.txt`. "Functionality not built" is NEVER a valid reason.
+Document the SPECIFIC external blocker in the `## Blocked Features` section of `claude-progress.txt`. "Functionality not built" is NEVER a valid reason.
 
 ### STEP 5: IMPLEMENT THE FEATURE
 
@@ -323,20 +335,55 @@ git commit -m "Implement [feature name] - verified end-to-end
 
 ### STEP 9: UPDATE PROGRESS NOTES
 
-Update `claude-progress.txt` with:
+Update `claude-progress.txt` using **structured sections**. This file has four sections - update only the relevant ones:
 
-- What you accomplished this session
-- Which test(s) you completed
-- Any issues discovered or fixed
-- What should be worked on next
-- Current completion status (e.g., "45/200 tests passing")
+**Section 1: `## Session Log`** (append-only)
+Append a timestamped entry at the end of this section:
+
+```
+### Session [date/time]
+- Completed: Feature #42 - User login
+- Fixed: Bug in password validation
+- Status: 45/200 passing
+```
+
+**Section 2: `## Known Issues`** (update as needed)
+List any active issues that future sessions should be aware of:
+
+```
+- Issue: API rate limiting causing intermittent failures
+- Issue: Dark mode styles incomplete
+```
+
+Remove issues when resolved.
+
+**Section 3: `## Blocked Features`** (update as needed)
+List features you had to skip due to external blockers:
+
+```
+- Feature #67: Stripe integration - API keys not configured
+```
+
+Remove entries when blockers are resolved.
+
+**Section 4: `## Next Session`** (clear and replace)
+Write specific guidance for the next session:
+
+```
+- Priority: Fix the authentication bug before new features
+- Note: User table migration needs review
+```
+
+This section is cleared by the next session after reading.
+
+**If the file doesn't exist**, create it with these four section headers.
 
 ### STEP 10: END SESSION CLEANLY
 
 Before context fills up:
 
 1. Commit all working code
-2. Update claude-progress.txt
+2. Update claude-progress.txt (structured sections - Session Log, Known Issues, Blocked Features, Next Session)
 3. Mark features as passing if tests verified
 4. Ensure no uncommitted changes
 5. Leave app in working state (no broken features)
