@@ -3,11 +3,11 @@
 ## Current Position
 
 Phase: 1 of 5 (Spec-Driven Architecture)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-10 - Completed 01-02-PLAN.md (Initializer Spec Generation)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-01-10 - Completed 01-03-PLAN.md (Hybrid Approach Integration)
 
-Progress: ███░░░░░░░ 13%
+Progress: ████░░░░░░ 20%
 
 ## Accumulated Context
 
@@ -21,6 +21,9 @@ Progress: ███░░░░░░░ 13%
 | 01-02 | Numbered prefixes (01-, 02-) for spec priority | Natural sort order, simpler than frontmatter-only |
 | 01-02 | AGENTS.md under 60 lines | Ralph Wiggum guidance for quick parsing |
 | 01-02 | Hybrid database approach | Keep feature_create_bulk for runtime tracking |
+| 01-03 | Match specs to features by name | H1 title matching, simple and predictable |
+| 01-03 | Sync preserves status | Update content but keep passes/in_progress intact |
+| 01-03 | Include full spec in feature_get_next | Agent has complete requirements without extra file read |
 
 ### Patterns Established
 
@@ -31,6 +34,11 @@ From 01-01:
 From 01-02:
 - Spec file naming: `specs/{NN}-{feature-name}.md`
 - AGENTS.md as operational quick reference (<60 lines)
+
+From 01-03:
+- Hybrid architecture: specs for content, database for status
+- Auto-load specs on startup if database empty
+- feature_sync_from_specs for manual spec edits
 
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
@@ -55,7 +63,7 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-10
-Stopped at: Completed 01-02-PLAN.md
+Stopped at: Completed 01-03-PLAN.md (Phase 1 complete)
 Resume file: None
 
 ## Phase Dependencies
@@ -88,4 +96,4 @@ Phase 5 (Sandbox Hardening)
 
 ---
 
-*State updated: 2026-01-10*
+*State updated: 2026-01-10 - Phase 1 Complete*

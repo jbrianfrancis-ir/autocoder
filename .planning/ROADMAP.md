@@ -19,7 +19,7 @@ Validate and align the AutoCoder agent harness implementation with the definitiv
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Spec-Driven Architecture** - Align feature tracking with specs-as-source-truth pattern
+- [x] **Phase 1: Spec-Driven Architecture** - Align feature tracking with specs-as-source-truth pattern
 - [ ] **Phase 2: Deterministic Loop** - Ensure agent starts from known state each iteration
 - [ ] **Phase 3: Backpressure Validation** - Strengthen test/lint/type-check gates before commits
 - [ ] **Phase 4: Context Optimization** - Implement markdown-over-JSON and token efficiency patterns
@@ -55,7 +55,7 @@ Gap analysis needed:
 Plans:
 - [x] 01-01: Spec format & parser (complete)
 - [x] 01-02: Initializer spec generation (complete)
-- [ ] 01-03: Hybrid approach integration
+- [x] 01-03: Hybrid approach integration (complete)
 
 #### Phase 2: Deterministic Loop
 
@@ -166,7 +166,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Spec-Driven Architecture | v1.0 | 2/3 | In progress | - |
+| 1. Spec-Driven Architecture | v1.0 | 3/3 | Complete | 2026-01-10 |
 | 2. Deterministic Loop | v1.0 | 0/? | Not started | - |
 | 3. Backpressure Validation | v1.0 | 0/? | Not started | - |
 | 4. Context Optimization | v1.0 | 0/? | Not started | - |
