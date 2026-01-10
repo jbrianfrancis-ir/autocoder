@@ -80,7 +80,8 @@ Gap analysis needed:
 - Check prompt seeding consistency
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01: Analysis & design (decision checkpoint)
+- [ ] 02-02: Implementation
 
 #### Phase 3: Backpressure Validation
 
@@ -167,7 +168,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Spec-Driven Architecture | v1.0 | 3/3 | Complete | 2026-01-10 |
-| 2. Deterministic Loop | v1.0 | 0/? | Not started | - |
+| 2. Deterministic Loop | v1.0 | 0/2 | Planned | - |
 | 3. Backpressure Validation | v1.0 | 0/? | Not started | - |
 | 4. Context Optimization | v1.0 | 0/? | Not started | - |
 | 5. Sandbox Hardening | v1.0 | 0/? | Not started | - |
