@@ -13,65 +13,81 @@ before proceeding.
 
 ## REQUIRED FEATURE COUNT
 
-**CRITICAL:** You must create exactly **[FEATURE_COUNT]** features using the `feature_create_bulk` tool.
+**CRITICAL:** You must create exactly **[FEATURE_COUNT]** spec files in the `specs/` directory.
 
-This number was determined during spec creation and must be followed precisely. Do not create more or fewer features than specified.
+This number was determined during spec creation and must be followed precisely. Do not create more or fewer specs than specified.
 
 ---
 
-### CRITICAL FIRST TASK: Create Features
+### CRITICAL FIRST TASK: Create Spec Files
 
-Based on `app_spec.txt`, create features using the feature_create_bulk tool. The features are stored in a SQLite database,
-which is the single source of truth for what needs to be built.
+Based on `app_spec.txt`, create markdown spec files in the `specs/` directory. These specs are the **source of truth** for what needs to be built.
 
-**Creating Features:**
+**Creating Specs:**
 
-Use the feature_create_bulk tool to add all features at once:
+1. Create the `specs/` directory in the project root
+2. Create one `.md` file per feature/test case
+3. Use numbered prefixes for priority ordering (01-, 02-, etc.)
+
+**File naming:** `specs/{NN}-{feature-name-in-kebab-case}.md`
+
+**Spec file format:**
+
+```markdown
+---
+category: functional
+priority: 1
+status: pending
+---
+
+# Feature Name
+
+Brief description of what this feature does and why it matters.
+
+## Acceptance Criteria
+
+- First criterion (verifiable outcome)
+- Second criterion
+- Third criterion
+
+## Test Steps
+
+1. First test step
+2. Second test step
+3. Third test step
+```
+
+**Example specs to create:**
 
 ```
-Use the feature_create_bulk tool with features=[
-  {
-    "category": "functional",
-    "name": "Brief feature name",
-    "description": "Brief description of the feature and what this test verifies",
-    "steps": [
-      "Step 1: Navigate to relevant page",
-      "Step 2: Perform action",
-      "Step 3: Verify expected result"
-    ]
-  },
-  {
-    "category": "style",
-    "name": "Brief feature name",
-    "description": "Brief description of UI/UX requirement",
-    "steps": [
-      "Step 1: Navigate to page",
-      "Step 2: Take screenshot",
-      "Step 3: Verify visual requirements"
-    ]
-  }
-]
+specs/
+  01-user-login-with-email.md
+  02-user-registration.md
+  03-password-reset-flow.md
+  04-dashboard-loads-correctly.md
+  ...
 ```
 
-**Notes:**
-- IDs and priorities are assigned automatically based on order
-- All features start with `passes: false` by default
-- You can create features in batches if there are many (e.g., 50 at a time)
+**After creating all spec files:** Use the `feature_create_bulk` tool to load specs into the database for runtime tracking. The coding agent will use the database for feature management, but the spec files remain the source of truth.
 
-**Requirements for features:**
+**Frontmatter fields:**
+- `category`: functional, ui, api, security, performance
+- `priority`: Integer (lower = higher priority, encoded in filename prefix)
+- `status`: pending (always starts as pending)
 
-- Feature count must match the `feature_count` specified in app_spec.txt
+**Requirements for specs:**
+
+- Spec count must match the `feature_count` specified in app_spec.txt
 - Reference tiers for other projects:
-  - **Simple apps**: ~150 tests
-  - **Medium apps**: ~250 tests
-  - **Complex apps**: ~400+ tests
-- Both "functional" and "style" categories
+  - **Simple apps**: ~150 specs
+  - **Medium apps**: ~250 specs
+  - **Complex apps**: ~400+ specs
+- Both "functional" and "ui" categories
 - Mix of narrow tests (2-5 steps) and comprehensive tests (10+ steps)
-- At least 25 tests MUST have 10+ steps each (more for complex apps)
-- Order features by priority: fundamental features first (the API assigns priority based on order)
-- All features start with `passes: false` automatically
+- At least 25 specs MUST have 10+ steps each (more for complex apps)
+- Order specs by priority: fundamental features first (encoded in filename prefix)
 - Cover every feature in the spec exhaustively
-- **MUST include tests from ALL 20 mandatory categories below**
+- **MUST include specs from ALL 20 mandatory categories below**
 
 ---
 
@@ -458,10 +474,12 @@ The feature_list.json must include tests that **actively verify real data** and 
 ---
 
 **CRITICAL INSTRUCTION:**
-IT IS CATASTROPHIC TO REMOVE OR EDIT FEATURES IN FUTURE SESSIONS.
-Features can ONLY be marked as passing (via the `feature_mark_passing` tool with the feature_id).
-Never remove features, never edit descriptions, never modify testing steps.
+IT IS CATASTROPHIC TO REMOVE OR EDIT SPECS IN FUTURE SESSIONS.
+Spec files can ONLY be updated to change status from `pending` to `passing`.
+Never remove specs, never edit descriptions, never modify testing steps.
 This ensures no functionality is missed.
+
+The database mirrors the specs for runtime tracking - use `feature_mark_passing` tool when a spec passes.
 
 ### SECOND TASK: Create init.sh
 
@@ -474,19 +492,52 @@ set up and run the development environment. The script should:
 
 Base the script on the technology stack specified in `app_spec.txt`.
 
-### THIRD TASK: Initialize Git
+### THIRD TASK: Create AGENTS.md
+
+Create an `AGENTS.md` file in the project root as an operational reference for future agents:
+
+```markdown
+# AGENTS.md - Operational Reference
+
+## Quick Start
+
+[One-liner to get the app running based on detected stack]
+
+## Commands
+
+- **Install**: `[package manager install command]`
+- **Dev**: `[dev server command]`
+- **Build**: `[build command]`
+- **Test**: `[test command]`
+- **Lint**: `[lint command]`
+
+## Key Locations
+
+- Frontend: `[path based on stack]`
+- Backend: `[path based on stack]`
+- Specs: `specs/`
+- Database: `features.db`
+
+## Notes
+
+[Any project-specific operational notes]
+```
+
+Keep this file under 60 lines. Update it as the project evolves.
+
+### FOURTH TASK: Initialize Git
 
 Create a git repository and make your first commit with:
 
+- specs/ directory with all spec files
+- AGENTS.md (operational reference)
 - init.sh (environment setup script)
 - README.md (project overview and setup instructions)
 - Any initial project structure files
 
-Note: Features are stored in the SQLite database (features.db), not in a JSON file.
+Commit message: "Initial setup: specs, AGENTS.md, init.sh, project structure"
 
-Commit message: "Initial setup: init.sh, project structure, and features created via API"
-
-### FOURTH TASK: Create Project Structure
+### FIFTH TASK: Create Project Structure
 
 Set up the basic project structure based on what's specified in `app_spec.txt`.
 This typically includes directories for frontend, backend, and any other
