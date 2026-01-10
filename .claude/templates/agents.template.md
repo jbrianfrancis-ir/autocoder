@@ -35,6 +35,14 @@ Quick reference for agents working on this project. Keep under 60 lines.
 3. Verify against test steps
 4. Mark passing with `feature_mark_passing`
 
+## Session Architecture
+
+**Deterministic fresh-start loop:** Each session starts with identical context, works on one feature, exits cleanly. Database tracks progress (`features.db`), specs define requirements (`specs/`).
+
+**State files:** `specs/` (source of truth), `features.db` (progress), `claude-progress.txt` (structured: Known Issues, Blocked, Next Session)
+
+**Flow:** Fresh client → prompt loaded → `feature_get_next` → implement → verify → mark passing → exit
+
 ## Notes
 
 [Project-specific notes added by initializer or coding agent]
