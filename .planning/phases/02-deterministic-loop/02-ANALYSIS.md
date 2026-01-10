@@ -270,12 +270,35 @@ The question is: Does the context from prior sessions help or hurt agent perform
 
 ---
 
-## Decision Required
+## Decision Made
 
-See Task 3 checkpoint for options:
-1. **remove-progress**: Full Ralph Wiggum alignment, maximum determinism
-2. **structure-progress**: Keep notes, make sections explicit
-3. **read-only-progress**: Write breadcrumbs for humans, agent never reads
-4. **keep-current**: Minor cleanup, trust existing system
+**Selected: structure-progress** — Structure claude-progress.txt with defined sections.
 
-The implementation in 02-02 will follow whichever approach is selected.
+### Rationale
+
+This approach balances determinism with observability:
+
+1. **Maintains human debugging value** - Session notes remain readable for humans reviewing agent work
+2. **Enables selective reading** - Agent can be instructed to read only specific sections (e.g., "Known Issues") rather than unstructured prose
+3. **Reduces variance** - Structured sections are more predictable than free-form notes
+4. **Backwards compatible** - Existing projects can migrate incrementally
+
+### Implementation Approach for 02-02
+
+1. **Define structured sections:**
+   - `## Session Log` - Append-only session summaries (human reference)
+   - `## Known Issues` - Active issues agent should be aware of
+   - `## Blocked Features` - Features skipped due to external blockers
+   - `## Next Session` - Specific guidance for next session (if any)
+
+2. **Update prompt templates:**
+   - Instruct agent to read only relevant sections (e.g., Known Issues)
+   - Instruct agent to append to Session Log (not rewrite)
+   - Clear Next Session after reading
+
+3. **Determinism improvement:**
+   - Session Log is write-only (append, never read)
+   - Known Issues and Blocked Features are read (predictable, structured)
+   - Reduces variance from unstructured prose context
+
+This provides ~80% of the determinism benefit while preserving full human observability.
