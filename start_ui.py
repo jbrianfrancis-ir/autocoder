@@ -165,7 +165,7 @@ def start_dev_server(port: int) -> tuple:
     backend = subprocess.Popen([
         str(venv_python), "-m", "uvicorn",
         "server.main:app",
-        "--host", "127.0.0.1",
+        "--host", "0.0.0.0",
         "--port", str(port),
         "--reload"
     ], cwd=str(ROOT))
@@ -190,7 +190,7 @@ def start_production_server(port: int):
     return subprocess.Popen([
         str(venv_python), "-m", "uvicorn",
         "server.main:app",
-        "--host", "127.0.0.1",
+        "--host", "0.0.0.0",
         "--port", str(port)
     ], cwd=str(ROOT))
 

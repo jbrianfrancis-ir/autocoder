@@ -25,6 +25,11 @@ fi
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment..."
     $PYTHON_CMD -m venv venv
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to create virtual environment"
+        echo "Make sure python3-venv is installed: sudo apt install python3-venv"
+        exit 1
+    fi
 fi
 
 # Activate the virtual environment
@@ -35,4 +40,4 @@ echo "Installing dependencies..."
 pip install -r requirements.txt --quiet
 
 # Run the Python launcher
-python start_ui.py "$@"
+$PYTHON_CMD start_ui.py "$@"

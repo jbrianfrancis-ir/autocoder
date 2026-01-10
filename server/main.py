@@ -53,15 +53,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS - allow only localhost origins for security
+# CORS - allow localhost and LAN origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",      # Vite dev server
-        "http://127.0.0.1:5173",
-        "http://localhost:8888",      # Production
-        "http://127.0.0.1:8888",
-    ],
+    allow_origins=["*"],  # Allow all origins for LAN access
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,12 +69,26 @@ app.add_middleware(
 
 @app.middleware("http")
 async def require_localhost(request: Request, call_next):
-    """Only allow requests from localhost."""
+    """Allow requests from localhost and LAN (private IP ranges)."""
     client_host = request.client.host if request.client else None
 
-    # Allow localhost connections
-    if client_host not in ("127.0.0.1", "::1", "localhost", None):
-        raise HTTPException(status_code=403, detail="Localhost access only")
+    # Allow localhost and private IP ranges (LAN access)
+    if client_host is not None:
+        # Allow localhost
+        if client_host in ("127.0.0.1", "::1", "localhost"):
+            return await call_next(request)
+        # Allow private IP ranges (LAN)
+        if (client_host.startswith("192.168.") or
+            client_host.startswith("10.") or
+            client_host.startswith("172.16.") or
+            client_host.startswith("172.17.") or
+            client_host.startswith("172.18.") or
+            client_host.startswith("172.19.") or
+            client_host.startswith("172.2") or
+            client_host.startswith("172.30.") or
+            client_host.startswith("172.31.")):
+            return await call_next(request)
+        raise HTTPException(status_code=403, detail="LAN access only")
 
     return await call_next(request)
 
