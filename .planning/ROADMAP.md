@@ -158,7 +158,8 @@ Gap analysis needed:
 - Address CORS and other security concerns from CONCERNS.md
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01: Quick wins (CORS, symlink checks, blast radius docs)
+- [ ] 05-02: Process isolation (resource limits, env sanitization, allowlist audit)
 
 ## Progress
 
@@ -171,4 +172,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Deterministic Loop | v1.0 | 2/2 | Complete | 2026-01-10 |
 | 3. Backpressure Validation | v1.0 | 1/1 | Complete | 2026-01-10 |
 | 4. Context Optimization | v1.0 | 1/1 | Complete | 2026-01-11 |
-| 5. Sandbox Hardening | v1.0 | 0/? | Not started | - |
+| 5. Sandbox Hardening | v1.0 | 0/2 | Not started | - |
