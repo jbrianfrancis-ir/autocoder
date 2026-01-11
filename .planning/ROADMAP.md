@@ -22,7 +22,7 @@ Validate and align the AutoCoder agent harness implementation with the definitiv
 - [x] **Phase 1: Spec-Driven Architecture** - Align feature tracking with specs-as-source-truth pattern
 - [x] **Phase 2: Deterministic Loop** - Ensure agent starts from known state each iteration
 - [x] **Phase 3: Backpressure Validation** - Strengthen test/lint/type-check gates before commits
-- [ ] **Phase 4: Context Optimization** - Implement markdown-over-JSON and token efficiency patterns
+- [x] **Phase 4: Context Optimization** - Implement markdown-over-JSON and token efficiency patterns
 - [ ] **Phase 5: Sandbox Hardening** - Ensure isolated execution with understood blast radius
 
 ## Phase Details
@@ -131,7 +131,7 @@ Gap analysis needed:
 - Consider impact on MCP tool design
 
 Plans:
-- [ ] 04-01: TBD
+- [x] 04-01: Markdown MCP responses & token budget docs (complete)
 
 #### Phase 5: Sandbox Hardening
 
@@ -170,5 +170,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Spec-Driven Architecture | v1.0 | 3/3 | Complete | 2026-01-10 |
 | 2. Deterministic Loop | v1.0 | 2/2 | Complete | 2026-01-10 |
 | 3. Backpressure Validation | v1.0 | 1/1 | Complete | 2026-01-10 |
-| 4. Context Optimization | v1.0 | 0/? | Not started | - |
+| 4. Context Optimization | v1.0 | 1/1 | Complete | 2026-01-11 |
 | 5. Sandbox Hardening | v1.0 | 0/? | Not started | - |

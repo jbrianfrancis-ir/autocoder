@@ -2,12 +2,12 @@
 
 ## Current Position
 
-Phase: 3 of 5 (Backpressure Validation)
+Phase: 4 of 5 (Context Optimization)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-01-10 - Completed 03-01-PLAN.md (Validation Gates)
+Last activity: 2026-01-11 - Completed 04-01-PLAN.md (Context Optimization)
 
-Progress: ███████░░░ 60%
+Progress: ████████░░ 80%
 
 ## Accumulated Context
 
@@ -15,6 +15,8 @@ Progress: ███████░░░ 60%
 
 | Phase | Decision | Rationale |
 |-------|----------|-----------|
+| 04-01 | Markdown over JSON for MCP tools | Token efficiency per Ralph Wiggum principle |
+| 04-01 | Keep feature_create_bulk as JSON | Initialization utility, not agent context |
 | 03-01 | Validation gates as STEP 8 before commit | Enforces quality before any commit attempt |
 | 03-01 | Table format for failure guardrails | Easy to scan Error | Cause | Fix structure |
 | 02-02 | Selective grep for section reading | Avoids full file read, maintains determinism |
@@ -50,6 +52,11 @@ From 02-02:
 - Selective reading via grep for structured sections only
 - Session Architecture section in AGENTS.md template
 
+From 04-01:
+- MCP tools return markdown for token efficiency
+- format_feature_markdown helper for consistent formatting
+- Token budget targets: specs ~5k, stats ~200, next ~500 tokens
+
 From 03-01:
 - STEP 8: VALIDATION GATES (BLOCKING) before commits
 - COMMON FAILURE PATTERNS section with Error | Cause | Fix tables
@@ -77,9 +84,9 @@ From `.planning/codebase/CONCERNS.md`:
 
 ## Session Continuity
 
-Last session: 2026-01-10
-Stopped at: Completed 03-01-PLAN.md (Validation Gates) - Phase 3 complete
-Resume file: None (ready for Phase 4 planning)
+Last session: 2026-01-11
+Stopped at: Completed 04-01-PLAN.md (Context Optimization) - Phase 4 complete
+Resume file: None (ready for Phase 5 planning)
 
 ## Phase Dependencies
 
@@ -111,4 +118,4 @@ Phase 5 (Sandbox Hardening)
 
 ---
 
-*State updated: 2026-01-10 - Phase 3 Complete*
+*State updated: 2026-01-11 - Phase 4 Complete*
