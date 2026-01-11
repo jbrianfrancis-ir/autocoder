@@ -77,6 +77,67 @@ def apply_resource_limits() -> None:
         resource.RLIMIT_NPROC, (limits["max_processes"], limits["max_processes"])
     )
 
+
+# Environment variables allowed to pass through to subprocesses
+# This is a minimal set needed for development tasks
+ALLOWED_ENV_VARS = {
+    # Development environment
+    "NODE_ENV",  # Node.js environment (development, production, test)
+    "PYTHON_PATH",  # Python module search path (uppercase variant)
+    "PYTHONPATH",  # Python module search path (standard form)
+    # Package manager caches
+    "npm_config_cache",  # npm cache directory
+    "XDG_CACHE_HOME",  # XDG standard cache location
+    # Terminal
+    "COLORTERM",  # Terminal color support
+    "FORCE_COLOR",  # Force colored output
+}
+
+
+def get_safe_environment(project_dir: str | None = None) -> dict[str, str]:
+    """
+    Create sanitized environment for subprocess execution.
+
+    Removes sensitive variables and provides a minimal safe environment.
+    This prevents credential leakage from the parent process to subprocesses.
+
+    Variables intentionally EXCLUDED:
+    - API keys (ANTHROPIC_API_KEY, OPENAI_API_KEY, etc.)
+    - Cloud credentials (AWS_*, AZURE_*, GCP_*, etc.)
+    - Database credentials (DATABASE_URL, DB_PASSWORD, etc.)
+    - SSH/GPG keys (SSH_*, GPG_*, etc.)
+    - Tokens (GITHUB_TOKEN, GITLAB_TOKEN, etc.)
+
+    Args:
+        project_dir: Optional project directory path to use as HOME.
+                    If None, uses the actual HOME from environment.
+
+    Returns:
+        Dictionary of safe environment variables for subprocess.
+
+    Example:
+        subprocess.run(
+            ["npm", "install"],
+            env=get_safe_environment(project_dir="/path/to/project"),
+            cwd="/path/to/project"
+        )
+    """
+    # Start with minimal safe environment
+    safe_env: dict[str, str] = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "LANG": os.environ.get("LANG", "C.UTF-8"),
+        "HOME": project_dir or os.environ.get("HOME", ""),
+        "TERM": os.environ.get("TERM", "xterm-256color"),
+    }
+
+    # Add allowed development variables if present in parent environment
+    for var in ALLOWED_ENV_VARS:
+        if var in os.environ:
+            safe_env[var] = os.environ[var]
+
+    return safe_env
+
+
 # Allowed commands for development tasks
 # Minimal set needed for the autonomous coding demo
 ALLOWED_COMMANDS = {
