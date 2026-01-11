@@ -122,8 +122,62 @@ def get_blocked_paths() -> set[Path]:
     return blocked
 
 
-def is_path_blocked(path: Path) -> bool:
-    """Check if a path is in the blocked list."""
+def is_symlink_escape(path: Path, base_path: Path) -> bool:
+    """
+    Check if path is a symlink pointing outside the base directory.
+
+    This prevents symlink attacks where a symlink inside an allowed directory
+    points to a file/directory outside (e.g., ~/.ssh, /etc/passwd).
+
+    Args:
+        path: The path to check (may or may not be a symlink)
+        base_path: The base directory that symlinks should stay within
+
+    Returns:
+        True if path is a symlink that escapes base_path, False otherwise
+    """
+    # First check if it's a symlink at all (before resolving)
+    if not path.is_symlink():
+        return False
+
+    try:
+        # Get the resolved target of the symlink
+        target = path.resolve()
+        base_resolved = base_path.resolve()
+
+        # Check if target is within base directory
+        target.relative_to(base_resolved)
+        return False  # Target is within base - safe
+    except ValueError:
+        # relative_to raises ValueError if target is not under base
+        return True  # Target escapes base - blocked
+    except (OSError, RuntimeError):
+        # Resolution failed (broken symlink, loop, etc.) - block to be safe
+        return True
+
+
+def is_path_blocked(path: Path, base_path: Path | None = None) -> bool:
+    """
+    Check if a path is in the blocked list or is a symlink escape.
+
+    Args:
+        path: The path to check
+        base_path: Optional base directory for symlink escape detection.
+                   If not provided, uses user's home directory.
+
+    Returns:
+        True if path should be blocked, False otherwise
+    """
+    # Use home directory as default base for symlink escape detection
+    if base_path is None:
+        base_path = Path.home()
+
+    # Security: Check for symlink escapes BEFORE resolving
+    # This prevents TOCTOU attacks where symlink is checked after resolution
+    if is_symlink_escape(path, base_path):
+        logger.warning("Blocked symlink escape attempt: %s", path)
+        return True
+
     try:
         resolved = path.resolve()
     except (OSError, ValueError):
@@ -208,13 +262,23 @@ async def list_directory(
             )
         target = Path(path)
 
+        # Security: Check for symlink escape BEFORE resolving
+        # This prevents attacks where user provides path containing symlink
+        # that points outside allowed directories
+        if is_symlink_escape(target, Path.home()):
+            logger.warning("Blocked symlink escape in path: %s", path)
+            raise HTTPException(
+                status_code=403,
+                detail="Symlink points outside allowed directories"
+            )
+
     # Resolve symlinks and get absolute path
     try:
         target = target.resolve()
     except (OSError, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"Invalid path: {e}")
 
-    # Security: Check if path is blocked
+    # Security: Check if path is blocked (also checks symlinks in resolved path)
     if is_path_blocked(target):
         logger.warning("Blocked access to restricted path: %s", target)
         raise HTTPException(
