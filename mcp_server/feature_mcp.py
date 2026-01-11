@@ -83,6 +83,62 @@ _session_maker = None
 _engine = None
 
 
+def format_feature_markdown(
+    feature: Feature,
+    include_spec: bool = False,
+    spec_filepath: str | None = None,
+    spec_description: str | None = None,
+    spec_steps: list[str] | None = None,
+) -> str:
+    """Format a Feature as markdown for token-efficient agent consumption.
+
+    Args:
+        feature: The Feature object to format
+        include_spec: Whether to include spec file information
+        spec_filepath: Path to the spec file (if include_spec is True)
+        spec_description: Description from the spec (if include_spec is True)
+        spec_steps: Steps from the spec (if include_spec is True)
+
+    Returns:
+        Markdown-formatted string representation of the feature
+    """
+    status = "passing" if feature.passes else "in_progress" if feature.in_progress else "pending"
+
+    lines = [
+        f"**ID:** {feature.id} | **Priority:** {feature.priority} | **Category:** {feature.category} | **Status:** {status}",
+        "",
+        f"### {feature.name}",
+        "",
+        feature.description,
+        "",
+        "### Test Steps",
+    ]
+    for i, step in enumerate(feature.steps, 1):
+        lines.append(f"{i}. {step}")
+
+    if include_spec and spec_filepath:
+        lines.extend([
+            "",
+            "### Spec File",
+            f"`{spec_filepath}`",
+        ])
+        if spec_description:
+            lines.extend([
+                "",
+                "### Spec Description",
+                spec_description,
+            ])
+        if spec_steps:
+            lines.extend([
+                "",
+                "### Spec Steps",
+            ])
+            for i, step in enumerate(spec_steps, 1):
+                lines.append(f"{i}. {step}")
+
+    return "\n".join(lines)
+
+
 @asynccontextmanager
 async def server_lifespan(server: FastMCP):
     """Initialize database on startup, cleanup on shutdown."""
@@ -149,7 +205,7 @@ def feature_get_stats() -> str:
     and completion percentage. Use this to track overall progress of the implementation.
 
     Returns:
-        JSON with: passing (int), in_progress (int), total (int), percentage (float)
+        Markdown-formatted progress statistics for token-efficient consumption.
     """
     session = get_session()
     try:
@@ -157,13 +213,12 @@ def feature_get_stats() -> str:
         passing = session.query(Feature).filter(Feature.passes == True).count()
         in_progress = session.query(Feature).filter(Feature.in_progress == True).count()
         percentage = round((passing / total) * 100, 1) if total > 0 else 0.0
+        remaining = total - passing - in_progress
 
-        return json.dumps({
-            "passing": passing,
-            "in_progress": in_progress,
-            "total": total,
-            "percentage": percentage
-        }, indent=2)
+        return f"""## Progress
+- Passing: {passing}/{total} ({percentage}%)
+- In Progress: {in_progress}
+- Remaining: {remaining}"""
     finally:
         session.close()
 
@@ -180,8 +235,8 @@ def feature_get_next() -> str:
     and detailed requirements.
 
     Returns:
-        JSON with feature details (id, priority, category, name, description, steps, passes, in_progress)
-        plus spec_filepath if specs/ exists. Returns error message if all features are passing.
+        Markdown-formatted feature details for token-efficient consumption.
+        Returns error message if all features are passing.
     """
     session = get_session()
     try:
@@ -193,24 +248,32 @@ def feature_get_next() -> str:
         )
 
         if feature is None:
-            return json.dumps({"error": "All features are passing! No more work to do."})
-
-        result = feature.to_dict()
+            return "**Error:** All features are passing! No more work to do."
 
         # Check for matching spec file
+        spec_filepath = None
+        spec_description = None
+        spec_steps = None
         specs_dir = PROJECT_DIR / "specs"
         if specs_dir.exists():
             # Find spec by matching name
             specs = parse_specs_directory(specs_dir)
             for spec in specs:
                 if spec["name"] == feature.name:
-                    result["spec_filepath"] = spec["filepath"]
-                    # Include full spec content for reference
-                    result["spec_description"] = spec["description"]
-                    result["spec_steps"] = spec["steps"]
+                    spec_filepath = spec["filepath"]
+                    spec_description = spec["description"]
+                    spec_steps = spec["steps"]
                     break
 
-        return json.dumps(result, indent=2)
+        result = "## Next Feature\n\n"
+        result += format_feature_markdown(
+            feature,
+            include_spec=bool(spec_filepath),
+            spec_filepath=spec_filepath,
+            spec_description=spec_description,
+            spec_steps=spec_steps,
+        )
+        return result
     finally:
         session.close()
 
@@ -229,7 +292,7 @@ def feature_get_for_regression(
         limit: Maximum number of features to return (1-10, default 3)
 
     Returns:
-        JSON with: features (list of feature objects), count (int)
+        Markdown-formatted list of features for token-efficient consumption.
     """
     session = get_session()
     try:
@@ -241,10 +304,20 @@ def feature_get_for_regression(
             .all()
         )
 
-        return json.dumps({
-            "features": [f.to_dict() for f in features],
-            "count": len(features)
-        }, indent=2)
+        if not features:
+            return "## Regression Features\n\nNo passing features available for regression testing."
+
+        lines = [
+            f"## Regression Features ({len(features)} selected)",
+            "",
+        ]
+        for feature in features:
+            lines.append(format_feature_markdown(feature))
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
+        return "\n".join(lines).rstrip("\n---\n")
     finally:
         session.close()
 
@@ -262,21 +335,21 @@ def feature_mark_passing(
         feature_id: The ID of the feature to mark as passing
 
     Returns:
-        JSON with the updated feature details, or error if not found.
+        Markdown confirmation of the status change, or error if not found.
     """
     session = get_session()
     try:
         feature = session.query(Feature).filter(Feature.id == feature_id).first()
 
         if feature is None:
-            return json.dumps({"error": f"Feature with ID {feature_id} not found"})
+            return f"**Error:** Feature with ID {feature_id} not found"
 
         feature.passes = True
         feature.in_progress = False
         session.commit()
         session.refresh(feature)
 
-        return json.dumps(feature.to_dict(), indent=2)
+        return f"Feature marked passing: **{feature.name}** (ID: {feature.id})"
     finally:
         session.close()
 
@@ -300,17 +373,17 @@ def feature_skip(
         feature_id: The ID of the feature to skip
 
     Returns:
-        JSON with skip details: id, name, old_priority, new_priority, message
+        Markdown confirmation of the skip action, or error if not found/already passing.
     """
     session = get_session()
     try:
         feature = session.query(Feature).filter(Feature.id == feature_id).first()
 
         if feature is None:
-            return json.dumps({"error": f"Feature with ID {feature_id} not found"})
+            return f"**Error:** Feature with ID {feature_id} not found"
 
         if feature.passes:
-            return json.dumps({"error": "Cannot skip a feature that is already passing"})
+            return "**Error:** Cannot skip a feature that is already passing"
 
         old_priority = feature.priority
 
@@ -323,13 +396,10 @@ def feature_skip(
         session.commit()
         session.refresh(feature)
 
-        return json.dumps({
-            "id": feature.id,
-            "name": feature.name,
-            "old_priority": old_priority,
-            "new_priority": new_priority,
-            "message": f"Feature '{feature.name}' moved to end of queue"
-        }, indent=2)
+        return f"""Feature skipped: **{feature.name}** (ID: {feature.id})
+- Old priority: {old_priority}
+- New priority: {new_priority}
+- Moved to end of queue"""
     finally:
         session.close()
 
@@ -347,26 +417,26 @@ def feature_mark_in_progress(
         feature_id: The ID of the feature to mark as in-progress
 
     Returns:
-        JSON with the updated feature details, or error if not found or already in-progress.
+        Markdown confirmation with feature details, or error if not found or already in-progress.
     """
     session = get_session()
     try:
         feature = session.query(Feature).filter(Feature.id == feature_id).first()
 
         if feature is None:
-            return json.dumps({"error": f"Feature with ID {feature_id} not found"})
+            return f"**Error:** Feature with ID {feature_id} not found"
 
         if feature.passes:
-            return json.dumps({"error": f"Feature with ID {feature_id} is already passing"})
+            return f"**Error:** Feature with ID {feature_id} is already passing"
 
         if feature.in_progress:
-            return json.dumps({"error": f"Feature with ID {feature_id} is already in-progress"})
+            return f"**Error:** Feature with ID {feature_id} is already in-progress"
 
         feature.in_progress = True
         session.commit()
         session.refresh(feature)
 
-        return json.dumps(feature.to_dict(), indent=2)
+        return f"Feature marked in-progress: **{feature.name}** (ID: {feature.id})"
     finally:
         session.close()
 
@@ -384,20 +454,20 @@ def feature_clear_in_progress(
         feature_id: The ID of the feature to clear in-progress status
 
     Returns:
-        JSON with the updated feature details, or error if not found.
+        Markdown confirmation, or error if not found.
     """
     session = get_session()
     try:
         feature = session.query(Feature).filter(Feature.id == feature_id).first()
 
         if feature is None:
-            return json.dumps({"error": f"Feature with ID {feature_id} not found"})
+            return f"**Error:** Feature with ID {feature_id} not found"
 
         feature.in_progress = False
         session.commit()
         session.refresh(feature)
 
-        return json.dumps(feature.to_dict(), indent=2)
+        return f"In-progress cleared: **{feature.name}** (ID: {feature.id}) - returned to pending"
     finally:
         session.close()
 
@@ -472,13 +542,11 @@ def feature_sync_from_specs() -> str:
     without losing progress on already-passing features.
 
     Returns:
-        JSON with: added (int), updated (int), unchanged (int), total_specs (int)
+        Markdown summary of sync results.
     """
     specs_dir = PROJECT_DIR / "specs"
     if not specs_dir.exists():
-        return json.dumps({
-            "error": "No specs/ directory found. Create specs/ with markdown spec files first."
-        })
+        return "**Error:** No specs/ directory found. Create specs/ with markdown spec files first."
 
     session = get_session()
     try:
@@ -527,15 +595,14 @@ def feature_sync_from_specs() -> str:
 
         session.commit()
 
-        return json.dumps({
-            "added": added,
-            "updated": updated,
-            "unchanged": unchanged,
-            "total_specs": len(specs)
-        }, indent=2)
+        return f"""## Specs Synced
+- Added: {added}
+- Updated: {updated}
+- Unchanged: {unchanged}
+- Total specs: {len(specs)}"""
     except Exception as e:
         session.rollback()
-        return json.dumps({"error": str(e)})
+        return f"**Error:** {e}"
     finally:
         session.close()
 
