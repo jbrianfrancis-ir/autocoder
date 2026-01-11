@@ -318,7 +318,36 @@ Use the feature_mark_passing tool with feature_id=42
 
 **ONLY MARK A FEATURE AS PASSING AFTER VERIFICATION WITH SCREENSHOTS.**
 
-### STEP 8: COMMIT YOUR PROGRESS
+### STEP 8: VALIDATION GATES (BLOCKING)
+
+**Before committing, run validation gates. These are BLOCKING - you cannot commit until they pass.**
+
+Run the appropriate commands for your project:
+
+**For TypeScript/JavaScript projects:**
+```bash
+npm run lint          # ESLint/Biome
+npm run typecheck     # or: npx tsc --noEmit
+npm run build         # Verify production build works
+```
+
+**For Python projects:**
+```bash
+ruff check .          # Linting
+mypy .                # Type checking
+python -m pytest      # Run tests if configured
+```
+
+**If any validation fails:**
+1. **STOP** - Do not proceed to commit
+2. Read the error messages carefully
+3. Fix all issues
+4. Re-run validation until it passes
+5. Only then proceed to commit
+
+**Backpressure principle:** Validation gates force code quality. Committing broken code wastes future sessions fixing avoidable bugs.
+
+### STEP 9: COMMIT YOUR PROGRESS
 
 Make a descriptive git commit:
 
@@ -328,12 +357,12 @@ git commit -m "Implement [feature name] - verified end-to-end
 
 - Added [specific changes]
 - Tested with browser automation
+- Validation gates passing (lint/type-check/build)
 - Marked feature #X as passing
-- Screenshots in verification/ directory
 "
 ```
 
-### STEP 9: UPDATE PROGRESS NOTES
+### STEP 10: UPDATE PROGRESS NOTES
 
 Update `claude-progress.txt` using **structured sections**. This file has four sections - update only the relevant ones:
 
@@ -378,7 +407,7 @@ This section is cleared by the next session after reading.
 
 **If the file doesn't exist**, create it with these four section headers.
 
-### STEP 10: END SESSION CLEANLY
+### STEP 11: END SESSION CLEANLY
 
 Before context fills up:
 
