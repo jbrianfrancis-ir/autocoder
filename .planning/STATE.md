@@ -2,12 +2,12 @@
 
 ## Current Position
 
-Phase: 2 of 5 (Deterministic Loop)
-Plan: 2 of 2 in current phase
+Phase: 3 of 5 (Backpressure Validation)
+Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-01-10 - Completed 02-02-PLAN.md (Implementation)
+Last activity: 2026-01-10 - Completed 03-01-PLAN.md (Validation Gates)
 
-Progress: ██████░░░░ 50%
+Progress: ███████░░░ 60%
 
 ## Accumulated Context
 
@@ -15,6 +15,8 @@ Progress: ██████░░░░ 50%
 
 | Phase | Decision | Rationale |
 |-------|----------|-----------|
+| 03-01 | Validation gates as STEP 8 before commit | Enforces quality before any commit attempt |
+| 03-01 | Table format for failure guardrails | Easy to scan Error | Cause | Fix structure |
 | 02-02 | Selective grep for section reading | Avoids full file read, maintains determinism |
 | 02-02 | Session Log marked "do not read" | Prevents unstructured prose from confusing agent |
 | 02-01 | structure-progress for claude-progress.txt | Balances determinism with human observability, enables selective reading |
@@ -48,6 +50,11 @@ From 02-02:
 - Selective reading via grep for structured sections only
 - Session Architecture section in AGENTS.md template
 
+From 03-01:
+- STEP 8: VALIDATION GATES (BLOCKING) before commits
+- COMMON FAILURE PATTERNS section with Error | Cause | Fix tables
+- Backpressure principle: fix errors before proceeding
+
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
 - Feature MCP server for agent-database communication
@@ -71,8 +78,8 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-10
-Stopped at: Completed 02-02-PLAN.md (Implementation) - Phase 2 complete
-Resume file: None (ready for Phase 3 planning)
+Stopped at: Completed 03-01-PLAN.md (Validation Gates) - Phase 3 complete
+Resume file: None (ready for Phase 4 planning)
 
 ## Phase Dependencies
 
@@ -104,4 +111,4 @@ Phase 5 (Sandbox Hardening)
 
 ---
 
-*State updated: 2026-01-10 - Phase 2 Complete*
+*State updated: 2026-01-10 - Phase 3 Complete*
