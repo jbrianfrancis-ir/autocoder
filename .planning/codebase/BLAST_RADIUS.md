@@ -2,6 +2,7 @@
 
 **Last Updated:** 2026-01-11
 **Applies to:** AutoCoder autonomous coding agent
+**Related:** [COMMAND_AUDIT.md](./COMMAND_AUDIT.md) - Detailed command security analysis
 
 ## Executive Summary
 
@@ -60,6 +61,40 @@ AutoCoder implements defense-in-depth with multiple security layers:
 - Blocks symlinks pointing outside base directory
 - Prevents TOCTOU (time-of-check-time-of-use) attacks
 
+### 5. Resource Limits (`security.py`)
+
+**Available via `apply_resource_limits()` function:**
+
+| Resource | Limit | Purpose |
+|----------|-------|---------|
+| CPU time | 300 seconds | Prevent CPU exhaustion attacks |
+| Virtual memory | 1 GB | Prevent memory exhaustion |
+| File size | 100 MB | Prevent disk space exhaustion |
+| Max processes | 50 | Prevent fork bomb attacks |
+
+**Usage:** Pass as `preexec_fn` to `subprocess.run()` or `subprocess.Popen()`.
+
+**Platform notes:** Only effective on Unix systems (Linux, macOS). Windows is a no-op.
+
+### 6. Environment Sanitization (`security.py`)
+
+**Available via `get_safe_environment()` function:**
+
+Provides minimal environment for subprocess execution, preventing credential leakage.
+
+**Variables passed through:**
+- Essential: `PATH`, `LANG`, `HOME`, `TERM`
+- Development: `NODE_ENV`, `PYTHONPATH`, `PYTHON_PATH`
+- Caches: `npm_config_cache`, `XDG_CACHE_HOME`
+- Terminal: `COLORTERM`, `FORCE_COLOR`
+
+**Variables explicitly excluded:**
+- API keys: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.
+- Cloud credentials: `AWS_*`, `AZURE_*`, `GCP_*`
+- Database: `DATABASE_URL`, `DB_PASSWORD`
+- Tokens: `GITHUB_TOKEN`, `GITLAB_TOKEN`
+- SSH/GPG: `SSH_*`, `GPG_*`
+
 ## Blast Radius
 
 ### If Agent is Compromised, Attacker CAN:
@@ -105,7 +140,9 @@ AutoCoder implements defense-in-depth with multiple security layers:
 | Gap | Status | Mitigation |
 |-----|--------|------------|
 | No outbound network filtering | Deferred | Run in network-isolated environment for sensitive projects |
-| No resource limits (CPU/memory) | Deferred | OS-level cgroups if needed |
+| Resource limits not wired in | Helper ready | `apply_resource_limits()` available but not yet integrated into agent subprocess calls |
+| Environment sanitization not wired in | Helper ready | `get_safe_environment()` available but not yet integrated into agent subprocess calls |
+| HIGH-risk commands lack deep validation | Documented | See [COMMAND_AUDIT.md](./COMMAND_AUDIT.md) - bash/node/npm/docker have code execution capability |
 | Silent exception handling in WebSocket | Known issue | Structured logging (future) |
 | No structured logging framework | Known issue | Add in future phase |
 
@@ -130,6 +167,10 @@ AutoCoder implements defense-in-depth with multiple security layers:
 | Date | Change |
 |------|--------|
 | 2026-01-11 | Initial documentation |
+| 2026-01-11 | Added resource limits helper (Section 5) |
+| 2026-01-11 | Added environment sanitization helper (Section 6) |
+| 2026-01-11 | Added reference to COMMAND_AUDIT.md |
+| 2026-01-11 | Updated known gaps with helper status |
 
 ---
 
