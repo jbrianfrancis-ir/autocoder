@@ -3,11 +3,11 @@
 ## Current Position
 
 Phase: 5 of 5 (Sandbox Hardening)
-Plan: 0 of 2 in current phase (planning complete)
-Status: Ready for execution
-Last activity: 2026-01-11 - Created 05-01-PLAN.md and 05-02-PLAN.md
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-11 - Completed 05-01-PLAN.md
 
-Progress: ████████░░ 80%
+Progress: █████████░ 90%
 
 ## Accumulated Context
 
@@ -15,6 +15,9 @@ Progress: ████████░░ 80%
 
 | Phase | Decision | Rationale |
 |-------|----------|-----------|
+| 05-01 | Localhost-only CORS (5173, 8888) | Security hardening, no wildcard origins |
+| 05-01 | Symlink check before path resolution | Prevents TOCTOU attacks |
+| 05-01 | Blast radius docs in .planning/codebase/ | Discoverability with other architecture docs |
 | 04-01 | Markdown over JSON for MCP tools | Token efficiency per Ralph Wiggum principle |
 | 04-01 | Keep feature_create_bulk as JSON | Initialization utility, not agent context |
 | 03-01 | Validation gates as STEP 8 before commit | Enforces quality before any commit attempt |
@@ -62,6 +65,10 @@ From 03-01:
 - COMMON FAILURE PATTERNS section with Error | Cause | Fix tables
 - Backpressure principle: fix errors before proceeding
 
+From 05-01:
+- is_symlink_escape() helper for symlink attack prevention
+- BLAST_RADIUS.md for security posture documentation
+
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
 - Feature MCP server for agent-database communication
@@ -71,7 +78,7 @@ From codebase analysis:
 ### Blockers/Concerns Carried Forward
 
 From `.planning/codebase/CONCERNS.md`:
-- CORS configuration over-permissive (`server/main.py:59`)
+- ~~CORS configuration over-permissive~~ (FIXED in 05-01)
 - Silent exception handling in WebSocket code
 - No structured logging framework
 - Test coverage gaps in core modules
@@ -85,8 +92,8 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-11
-Stopped at: Created Phase 5 plans (05-01-PLAN.md, 05-02-PLAN.md)
-Resume file: None (ready to execute 05-01-PLAN.md)
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None (ready to execute 05-02-PLAN.md)
 
 ## Phase Dependencies
 
@@ -118,4 +125,4 @@ Phase 5 (Sandbox Hardening)
 
 ---
 
-*State updated: 2026-01-11 - Phase 5 Plans Created*
+*State updated: 2026-01-11 - Completed 05-01-PLAN.md*
