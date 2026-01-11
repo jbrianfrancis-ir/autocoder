@@ -104,12 +104,12 @@ def format_feature_markdown(
     """
     status = "passing" if feature.passes else "in_progress" if feature.in_progress else "pending"
 
-    lines = [
+    lines: list[str] = [
         f"**ID:** {feature.id} | **Priority:** {feature.priority} | **Category:** {feature.category} | **Status:** {status}",
         "",
         f"### {feature.name}",
         "",
-        feature.description,
+        str(feature.description),
         "",
         "### Test Steps",
     ]
