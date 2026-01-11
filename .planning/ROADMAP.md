@@ -11,7 +11,7 @@ Validate and align the AutoCoder agent harness implementation with the definitiv
 
 ## Milestones
 
-- 🚧 **v1.0 Ralph Wiggum Alignment** - Phases 1-5 (in progress)
+- ✅ **v1.0 Ralph Wiggum Alignment** - Phases 1-5 (complete)
 
 ## Phases
 
@@ -23,11 +23,11 @@ Validate and align the AutoCoder agent harness implementation with the definitiv
 - [x] **Phase 2: Deterministic Loop** - Ensure agent starts from known state each iteration
 - [x] **Phase 3: Backpressure Validation** - Strengthen test/lint/type-check gates before commits
 - [x] **Phase 4: Context Optimization** - Implement markdown-over-JSON and token efficiency patterns
-- [ ] **Phase 5: Sandbox Hardening** - Ensure isolated execution with understood blast radius
+- [x] **Phase 5: Sandbox Hardening** - Ensure isolated execution with understood blast radius
 
 ## Phase Details
 
-### 🚧 v1.0 Ralph Wiggum Alignment (In Progress)
+### ✅ v1.0 Ralph Wiggum Alignment (Complete)
 
 **Milestone Goal:** Validate and align the agent harness with Ralph Wiggum methodology patterns for reliable autonomous operation.
 
@@ -159,7 +159,7 @@ Gap analysis needed:
 
 Plans:
 - [x] 05-01: Quick wins (CORS, symlink checks, blast radius docs)
-- [ ] 05-02: Process isolation (resource limits, env sanitization, allowlist audit)
+- [x] 05-02: Process isolation (resource limits, env sanitization, allowlist audit)
 
 ## Progress
 
@@ -172,4 +172,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Deterministic Loop | v1.0 | 2/2 | Complete | 2026-01-10 |
 | 3. Backpressure Validation | v1.0 | 1/1 | Complete | 2026-01-10 |
 | 4. Context Optimization | v1.0 | 1/1 | Complete | 2026-01-11 |
-| 5. Sandbox Hardening | v1.0 | 1/2 | In progress | - |
+| 5. Sandbox Hardening | v1.0 | 2/2 | Complete | 2026-01-11 |

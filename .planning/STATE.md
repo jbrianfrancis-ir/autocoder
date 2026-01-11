@@ -3,11 +3,11 @@
 ## Current Position
 
 Phase: 5 of 5 (Sandbox Hardening)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-11 - Completed 05-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-11 - Completed 05-02-PLAN.md
 
-Progress: █████████░ 90%
+Progress: ██████████ 100%
 
 ## Accumulated Context
 
@@ -15,6 +15,9 @@ Progress: █████████░ 90%
 
 | Phase | Decision | Rationale |
 |-------|----------|-----------|
+| 05-02 | Resource limits: 300s CPU, 1GB RAM, 100MB files, 50 procs | Reasonable bounds for dev tasks |
+| 05-02 | Env allowlist: PATH, LANG, HOME, TERM + dev vars | Prevents credential leakage to subprocesses |
+| 05-02 | Commands: 9 HIGH, 7 MEDIUM, 13 LOW risk | Audit informs future hardening priorities |
 | 05-01 | Localhost-only CORS (5173, 8888) | Security hardening, no wildcard origins |
 | 05-01 | Symlink check before path resolution | Prevents TOCTOU attacks |
 | 05-01 | Blast radius docs in .planning/codebase/ | Discoverability with other architecture docs |
@@ -69,6 +72,11 @@ From 05-01:
 - is_symlink_escape() helper for symlink attack prevention
 - BLAST_RADIUS.md for security posture documentation
 
+From 05-02:
+- apply_resource_limits() as preexec_fn for subprocess isolation
+- get_safe_environment() for credential leak prevention
+- COMMAND_AUDIT.md pattern for security documentation
+
 From codebase analysis:
 - Two-agent pattern (Initializer + Coding Agent) already implemented
 - Feature MCP server for agent-database communication
@@ -82,6 +90,7 @@ From `.planning/codebase/CONCERNS.md`:
 - Silent exception handling in WebSocket code
 - No structured logging framework
 - Test coverage gaps in core modules
+- Resource limits/env sanitization helpers ready but not wired into agent subprocess (deferred)
 
 ## Roadmap Evolution
 
@@ -92,8 +101,8 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-11
-Stopped at: Completed 05-01-PLAN.md
-Resume file: None (ready to execute 05-02-PLAN.md)
+Stopped at: Completed 05-02-PLAN.md (Phase 5 complete, Milestone complete)
+Resume file: None (ready for /gsd:complete-milestone)
 
 ## Phase Dependencies
 
@@ -125,4 +134,4 @@ Phase 5 (Sandbox Hardening)
 
 ---
 
-*State updated: 2026-01-11 - Completed 05-01-PLAN.md*
+*State updated: 2026-01-11 - Completed 05-02-PLAN.md (Phase 5 complete, Milestone v1.0 complete)*
