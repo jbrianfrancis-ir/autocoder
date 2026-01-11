@@ -223,6 +223,40 @@ Before context fills up:
 
 ---
 
+## COMMON FAILURE PATTERNS
+
+**When lint/type-check fails, use these patterns to diagnose and fix issues:**
+
+### TypeScript/JavaScript Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "Cannot find module 'X'" | Missing import or package | Check import path, run `npm install` |
+| "Type 'X' is not assignable to type 'Y'" | Type mismatch | Review type definitions, add proper annotations |
+| "Property 'X' does not exist on type 'Y'" | Typo or missing interface field | Check spelling, verify interface definition |
+| "Object is possibly 'undefined'" | Missing null check | Add optional chaining (`?.`) or null guard |
+
+### Python Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "IndentationError" | Mixed tabs/spaces | Use 4 spaces consistently |
+| "ImportError: No module named 'X'" | Missing dependency | Run `pip install X` |
+| "TypeError: 'NoneType' has no attribute" | Null reference | Add null check before accessing |
+| "SyntaxError" | Invalid Python syntax | Check for missing colons, parentheses |
+
+### Build Failures
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "Module not found" | Dependencies not installed | Run `npm install` or `pip install -r requirements.txt` |
+| "Compilation failed" | Type errors blocking build | Fix all type errors first |
+| "ENOENT: no such file" | Missing file reference | Check file paths, ensure files exist |
+
+**General principle:** If validation fails, you MUST fix the issue before committing. Do NOT proceed with broken code.
+
+---
+
 ## FEATURE TOOL USAGE RULES (CRITICAL - DO NOT VIOLATE)
 
 The feature tools exist to reduce token usage. **DO NOT make exploratory queries.**
