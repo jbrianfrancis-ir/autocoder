@@ -53,10 +53,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS - allow localhost and LAN origins
+# CORS - restrict to localhost origins only (UI development and production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for LAN access
+    allow_origins=[
+        "http://localhost:5173",    # Vite dev server
+        "http://127.0.0.1:5173",    # Vite dev server (IP)
+        "http://localhost:8888",    # FastAPI server
+        "http://127.0.0.1:8888",    # FastAPI server (IP)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
