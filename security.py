@@ -4,10 +4,78 @@ Security Hooks for Autonomous Coding Agent
 
 Pre-tool-use hooks that validate bash commands for security.
 Uses an allowlist approach - only explicitly permitted commands can run.
+
+Also provides:
+- Resource limits for subprocess execution (CPU, memory, file size)
+- Environment sanitization to prevent credential leakage
 """
 
+from __future__ import annotations
+
 import os
+import platform
 import shlex
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
+
+# Resource limits for subprocess execution (Unix only)
+# These values provide reasonable bounds for development tasks
+RESOURCE_LIMITS = {
+    "cpu_seconds": 300,  # 5 minutes CPU time
+    "memory_bytes": 1024 * 1024 * 1024,  # 1GB memory
+    "file_size_bytes": 100 * 1024 * 1024,  # 100MB max file size
+    "max_processes": 50,  # Limit child processes
+}
+
+
+def apply_resource_limits() -> None:
+    """
+    Pre-exec function to apply resource limits to subprocess.
+
+    This function should be passed as `preexec_fn` to subprocess.Popen/run.
+    Only works on Unix systems (Linux, macOS). On Windows, this is a no-op.
+
+    Limits applied:
+    - RLIMIT_CPU: Maximum CPU time in seconds
+    - RLIMIT_AS: Maximum address space (virtual memory)
+    - RLIMIT_FSIZE: Maximum file size that can be created
+    - RLIMIT_NPROC: Maximum number of child processes
+
+    Example:
+        subprocess.run(
+            ["python", "script.py"],
+            preexec_fn=apply_resource_limits
+        )
+    """
+    if platform.system() == "Windows":
+        # resource module not available on Windows
+        return
+
+    import resource
+
+    limits = RESOURCE_LIMITS
+
+    # CPU time limit (seconds)
+    resource.setrlimit(
+        resource.RLIMIT_CPU, (limits["cpu_seconds"], limits["cpu_seconds"])
+    )
+
+    # Virtual memory limit (bytes)
+    resource.setrlimit(
+        resource.RLIMIT_AS, (limits["memory_bytes"], limits["memory_bytes"])
+    )
+
+    # Maximum file size (bytes)
+    resource.setrlimit(
+        resource.RLIMIT_FSIZE, (limits["file_size_bytes"], limits["file_size_bytes"])
+    )
+
+    # Maximum number of processes
+    resource.setrlimit(
+        resource.RLIMIT_NPROC, (limits["max_processes"], limits["max_processes"])
+    )
 
 # Allowed commands for development tasks
 # Minimal set needed for the autonomous coding demo
