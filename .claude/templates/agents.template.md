@@ -43,12 +43,18 @@ Quick reference for agents working on this project. Keep under 60 lines.
 
 **Flow:** Fresh client → prompt → `feature_get_next` → implement → **validate** → verify → mark passing → commit → exit
 
-**Validation gates:** Lint, type-check, and build must pass before commits. Fix errors before proceeding - this is backpressure that forces code quality.
+**Validation gates:** Lint, type-check, build must pass before commits. Fix errors first.
+
+## Context Efficiency
+
+- MCP tools return markdown (not JSON) for efficient tokenization
+- Spec files: ~5,000 tokens upfront at session start
+- Progress check (`feature_get_stats`): ~200 tokens
+- Next feature (`feature_get_next`): ~500 tokens
+- Reserve ~70% context for implementation work
 
 ## Notes
 
-[Project-specific notes added by initializer or coding agent]
-
----
+[Project-specific notes]
 
 *Updated: [date]*
