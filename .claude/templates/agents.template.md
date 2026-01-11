@@ -41,7 +41,9 @@ Quick reference for agents working on this project. Keep under 60 lines.
 
 **State files:** `specs/` (source of truth), `features.db` (progress), `claude-progress.txt` (structured: Known Issues, Blocked, Next Session)
 
-**Flow:** Fresh client → prompt loaded → `feature_get_next` → implement → verify → mark passing → exit
+**Flow:** Fresh client → prompt → `feature_get_next` → implement → **validate** → verify → mark passing → commit → exit
+
+**Validation gates:** Lint, type-check, and build must pass before commits. Fix errors before proceeding - this is backpressure that forces code quality.
 
 ## Notes
 
