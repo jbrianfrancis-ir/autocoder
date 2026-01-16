@@ -37,13 +37,13 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
 **Milestone Goal:** Improve observability, document security posture, and add test confidence for core modules.
 
-- [ ] **Phase 6: Structured Logging** - Consistent, configurable logging across all Python modules
+- [x] **Phase 6: Structured Logging** (3/3 plans) - completed 2026-01-16
 - [ ] **Phase 7: Security Documentation** - BLAST_RADIUS.md documents how to wire in security helpers
 - [ ] **Phase 8: Agent Testing** - Core agent session loop has test coverage
 
 ## Phase Details
 
-### Phase 6: Structured Logging
+### Phase 6: Structured Logging ✅
 **Goal**: Consistent, configurable logging across all Python modules
 **Depends on**: Phase 5 (v1.0 complete)
 **Requirements**: LOG-01, LOG-02
@@ -51,10 +51,12 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
   1. All log messages include timestamp, level, module name, and message
   2. Log level can be changed via environment variable or config
   3. Different modules can have different log levels when needed
-**Plans**: TBD
+**Completed**: 2026-01-16
 
 Plans:
-- [ ] 06-01: TBD
+- [x] 06-01: Logging Configuration Foundation
+- [x] 06-02: Core Agent Module Logging
+- [x] 06-03: MCP Server and CLI Logging
 
 ### Phase 7: Security Documentation
 **Goal**: BLAST_RADIUS.md fully documents how to wire in security helpers
@@ -94,6 +96,6 @@ Phases execute in numeric order: 6 → 7 → 8
 | 3. Backpressure Validation | v1.0 | 1/1 | Complete | 2026-01-10 |
 | 4. Context Optimization | v1.0 | 1/1 | Complete | 2026-01-11 |
 | 5. Sandbox Hardening | v1.0 | 2/2 | Complete | 2026-01-11 |
-| 6. Structured Logging | v1.1 | 0/? | Not started | - |
+| 6. Structured Logging | v1.1 | 3/3 | Complete | 2026-01-16 |
 | 7. Security Documentation | v1.1 | 0/? | Not started | - |
 | 8. Agent Testing | v1.1 | 0/? | Not started | - |

@@ -9,8 +9,8 @@ Requirements for v1.1 Foundation Hardening milestone.
 
 ### Logging
 
-- [ ] **LOG-01**: All Python modules use consistent log format (timestamp, level, module, message)
-- [ ] **LOG-02**: Log levels are configurable (DEBUG/INFO/WARNING/ERROR) globally or per-module
+- [x] **LOG-01**: All Python modules use consistent log format (timestamp, level, module, message)
+- [x] **LOG-02**: Log levels are configurable (DEBUG/INFO/WARNING/ERROR) globally or per-module
 
 ### Security Documentation
 
@@ -59,8 +59,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOG-01 | Phase 6 | Pending |
-| LOG-02 | Phase 6 | Pending |
+| LOG-01 | Phase 6 | Complete |
+| LOG-02 | Phase 6 | Complete |
 | SEC-01 | Phase 7 | Pending |
 | SEC-02 | Phase 7 | Pending |
 | SEC-03 | Phase 7 | Pending |
