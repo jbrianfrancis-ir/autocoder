@@ -6,6 +6,10 @@ Main entry point for the Autonomous Coding UI server.
 Provides REST API, WebSocket, and static file serving.
 """
 
+# Configure logging FIRST, before any other imports that might log
+from logging_config import configure_logging
+configure_logging()
+
 import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -196,4 +200,5 @@ if __name__ == "__main__":
         host="127.0.0.1",  # Localhost only for security
         port=8888,
         reload=True,
+        log_config=None,  # Prevent uvicorn from overwriting our logging config
     )
