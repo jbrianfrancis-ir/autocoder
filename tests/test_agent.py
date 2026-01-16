@@ -1,12 +1,20 @@
 """
-Unit tests for agent.py run_agent_session function.
+Unit tests for agent.py functions.
 
 Tests cover:
+run_agent_session:
 - Normal flow returns ('continue', response_text)
 - Text block accumulation
 - Tool use block handling
 - Tool result block handling (success, error, blocked)
 - Exception handling returns ('error', message)
+
+run_autonomous_agent:
+- Single iteration completes successfully
+- First run uses initializer prompt
+- Continuation uses coding prompt
+- YOLO mode uses yolo prompt
+- Error status triggers retry with delay
 """
 
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -258,3 +266,162 @@ class TestRunAgentSessionMixedMessages:
         assert status == "continue"
         # Text from both AssistantMessages accumulated
         assert response == "Let me check the files. Found 2 files."
+
+
+class TestRunAutonomousAgentSingleIteration:
+    """Tests for run_autonomous_agent iteration control."""
+
+    @patch('builtins.print')
+    async def test_completes_with_max_iterations_one(
+        self, mock_print, mock_autonomous_agent_deps
+    ):
+        """run_autonomous_agent completes successfully with max_iterations=1."""
+        from agent import run_autonomous_agent
+
+        deps = mock_autonomous_agent_deps
+
+        # Execute - should complete without error
+        await run_autonomous_agent(
+            deps['project_dir'],
+            model='test-model',
+            max_iterations=1
+        )
+
+        # Verify client.query was called
+        deps['client'].query.assert_called()
+
+
+class TestRunAutonomousAgentPromptSelection:
+    """Tests for run_autonomous_agent prompt selection logic."""
+
+    @patch('builtins.print')
+    async def test_first_run_uses_initializer_prompt(
+        self, mock_print, mock_autonomous_agent_deps
+    ):
+        """First run (no features) uses initializer prompt."""
+        from agent import run_autonomous_agent
+
+        deps = mock_autonomous_agent_deps
+
+        # Override has_features to return False (first run)
+        deps['monkeypatch'].setattr('agent.has_features', lambda _: False)
+
+        # Track what prompt is passed to client.query
+        captured_prompt = None
+
+        async def capture_query(prompt):
+            nonlocal captured_prompt
+            captured_prompt = prompt
+
+        deps['client'].query = AsyncMock(side_effect=capture_query)
+
+        # Execute
+        await run_autonomous_agent(
+            deps['project_dir'],
+            model='test-model',
+            max_iterations=1
+        )
+
+        # Verify initializer prompt was used
+        assert captured_prompt == "init prompt"
+
+    @patch('builtins.print')
+    async def test_continuation_uses_coding_prompt(
+        self, mock_print, mock_autonomous_agent_deps
+    ):
+        """Continuation run (has features) uses coding prompt."""
+        from agent import run_autonomous_agent
+
+        deps = mock_autonomous_agent_deps
+
+        # has_features returns True by default (continuation)
+        # Track what prompt is passed to client.query
+        captured_prompt = None
+
+        async def capture_query(prompt):
+            nonlocal captured_prompt
+            captured_prompt = prompt
+
+        deps['client'].query = AsyncMock(side_effect=capture_query)
+
+        # Execute
+        await run_autonomous_agent(
+            deps['project_dir'],
+            model='test-model',
+            max_iterations=1
+        )
+
+        # Verify coding prompt was used
+        assert captured_prompt == "coding prompt"
+
+    @patch('builtins.print')
+    async def test_yolo_mode_uses_yolo_prompt(
+        self, mock_print, mock_autonomous_agent_deps
+    ):
+        """YOLO mode uses yolo prompt instead of standard coding prompt."""
+        from agent import run_autonomous_agent
+
+        deps = mock_autonomous_agent_deps
+
+        # has_features returns True by default (continuation)
+        # Track what prompt is passed to client.query
+        captured_prompt = None
+
+        async def capture_query(prompt):
+            nonlocal captured_prompt
+            captured_prompt = prompt
+
+        deps['client'].query = AsyncMock(side_effect=capture_query)
+
+        # Execute with YOLO mode
+        await run_autonomous_agent(
+            deps['project_dir'],
+            model='test-model',
+            max_iterations=1,
+            yolo_mode=True
+        )
+
+        # Verify yolo prompt was used
+        assert captured_prompt == "yolo prompt"
+
+
+class TestRunAutonomousAgentErrorHandling:
+    """Tests for run_autonomous_agent error handling."""
+
+    @patch('builtins.print')
+    async def test_error_status_triggers_retry_with_delay(
+        self, mock_print, mock_autonomous_agent_deps
+    ):
+        """Error status causes retry with asyncio.sleep delay."""
+        from agent import run_autonomous_agent
+
+        deps = mock_autonomous_agent_deps
+
+        # Create a mock receive_response generator that returns empty on first call
+        # but we need to simulate an error via run_agent_session returning 'error'
+        # The simplest way is to make client.query raise an exception first time
+
+        call_count = 0
+
+        async def mock_query_with_error(prompt):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                # First call: raise exception (will return 'error' status)
+                raise Exception("Simulated network error")
+            # Second call: succeed
+
+        deps['client'].query = AsyncMock(side_effect=mock_query_with_error)
+
+        # Execute with max_iterations=2 to allow retry
+        await run_autonomous_agent(
+            deps['project_dir'],
+            model='test-model',
+            max_iterations=2
+        )
+
+        # Verify asyncio.sleep was called (retry delay)
+        deps['sleep_mock'].assert_called()
+
+        # Verify query was called twice (original + retry)
+        assert call_count == 2
