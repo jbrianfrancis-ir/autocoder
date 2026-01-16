@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 8 of 8 (Agent Testing)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-01-16 — Completed 8-01-PLAN.md (Test Infrastructure)
+Last activity: 2026-01-16 — Completed 8-02-PLAN.md (Run Autonomous Agent Tests)
 
-Progress: ███████░░░ 71% (v1.1)
+Progress: ████████░░ 79% (v1.1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14 (9 v1.0 + 5 v1.1)
-- Average duration: 2.8min (v1.1 only)
-- Total execution time: 14min (v1.1)
+- Total plans completed: 15 (9 v1.0 + 6 v1.1)
+- Average duration: 2.7min (v1.1 only)
+- Total execution time: 16min (v1.1)
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: ███████░░░ 71% (v1.1)
 | v1.0 Phases 1-5 | 9 | — | — |
 | 6-structured-logging | 3/3 | 10min | 3.3min |
 | 7-security-documentation | 1/1 | 2min | 2.0min |
-| 8-agent-testing | 1/4 | 2min | 2.0min |
+| 8-agent-testing | 2/4 | 4min | 2.0min |
 
 **Recent Trend:**
-- Last 3 plans: 3min (6-03), 2min (7-01), 2min (8-01)
-- Trend: Consistent 2-3min per plan
+- Last 3 plans: 2min (7-01), 2min (8-01), 2min (8-02)
+- Trend: Consistent 2min per plan
 
 ## Milestone History
 
@@ -67,6 +67,8 @@ v1.1 Decisions:
 - ANTHROPIC_API_KEY must be explicitly re-added after get_safe_environment()
 - Use lightweight fake classes (not MagicMock) for SDK type matching in tests
 - pytest-asyncio asyncio_mode=auto for simpler async test syntax
+- Use fixture return dict for flexible dependency access and modification
+- Prompt capture pattern: Override client.query with side_effect to capture prompts
 
 ### Pending Todos
 
@@ -83,9 +85,9 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Completed 8-01-PLAN.md (Test Infrastructure)
+Stopped at: Completed 8-02-PLAN.md (Run Autonomous Agent Tests)
 Resume file: None
 
 ---
 
-*State updated: 2026-01-16 - Plan 8-01 complete, 3 plans remaining in Phase 8*
+*State updated: 2026-01-16 - Plan 8-02 complete, 2 plans remaining in Phase 8*
