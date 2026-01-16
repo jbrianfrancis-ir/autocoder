@@ -7,11 +7,14 @@ Core agent interaction functions for running autonomous coding sessions.
 
 import asyncio
 import io
+import logging
 import sys
 from pathlib import Path
 from typing import Optional
 
 from claude_agent_sdk import ClaudeSDKClient
+
+logger = logging.getLogger(__name__)
 
 # Fix Windows console encoding for Unicode characters (emoji, etc.)
 # Without this, print() crashes when Claude outputs emoji like ✅
@@ -50,7 +53,7 @@ async def run_agent_session(
         - "continue" if agent should continue working
         - "error" if an error occurred
     """
-    print("Sending prompt to Claude Agent SDK...\n")
+    logger.info("Sending prompt to Claude Agent SDK")
 
     try:
         # Send the query
@@ -102,7 +105,7 @@ async def run_agent_session(
         return "continue", response_text
 
     except Exception as e:
-        print(f"Error during agent session: {e}")
+        logger.error("Error during agent session: %s", e)
         return "error", str(e)
 
 
@@ -124,16 +127,10 @@ async def run_autonomous_agent(
     print("\n" + "=" * 70)
     print("  AUTONOMOUS CODING AGENT DEMO")
     print("=" * 70)
-    print(f"\nProject directory: {project_dir}")
-    print(f"Model: {model}")
-    if yolo_mode:
-        print("Mode: YOLO (testing disabled)")
-    else:
-        print("Mode: Standard (full testing)")
-    if max_iterations:
-        print(f"Max iterations: {max_iterations}")
-    else:
-        print("Max iterations: Unlimited (will run until completion)")
+    logger.info("Project directory: %s", project_dir)
+    logger.info("Model: %s", model)
+    logger.info("Mode: %s", "YOLO (testing disabled)" if yolo_mode else "Standard (full testing)")
+    logger.info("Max iterations: %s", max_iterations if max_iterations else "Unlimited")
     print()
 
     # Create project directory
@@ -145,7 +142,7 @@ async def run_autonomous_agent(
     is_first_run = not has_features(project_dir)
 
     if is_first_run:
-        print("Fresh start - will use initializer agent")
+        logger.info("Fresh start - will use initializer agent")
         print()
         print("=" * 70)
         print("  NOTE: First session takes 10-20+ minutes!")
@@ -156,7 +153,7 @@ async def run_autonomous_agent(
         # Copy the app spec into the project directory for the agent to read
         copy_spec_to_project(project_dir)
     else:
-        print("Continuing existing project")
+        logger.info("Continuing existing project")
         print_progress_summary(project_dir)
 
     # Main loop
@@ -167,7 +164,7 @@ async def run_autonomous_agent(
 
         # Check max iterations
         if max_iterations and iteration > max_iterations:
-            print(f"\nReached max iterations ({max_iterations})")
+            logger.info("Reached max iterations: %d", max_iterations)
             print("To continue, run the script again without --max-iterations")
             break
 
@@ -200,13 +197,12 @@ async def run_autonomous_agent(
             await asyncio.sleep(AUTO_CONTINUE_DELAY_SECONDS)
 
         elif status == "error":
-            print("\nSession encountered an error")
-            print("Will retry with a fresh session...")
+            logger.warning("Session encountered an error, will retry")
             await asyncio.sleep(AUTO_CONTINUE_DELAY_SECONDS)
 
         # Small delay between sessions
         if max_iterations is None or iteration < max_iterations:
-            print("\nPreparing next session...\n")
+            logger.debug("Preparing next session")
             await asyncio.sleep(1)
 
     # Final summary

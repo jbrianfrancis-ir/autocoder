@@ -6,6 +6,7 @@ Functions for creating and configuring the Claude Agent SDK client.
 """
 
 import json
+import logging
 import os
 import shutil
 import sys
@@ -15,6 +16,8 @@ from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
 from claude_agent_sdk.types import HookMatcher
 
 from security import bash_security_hook
+
+logger = logging.getLogger(__name__)
 
 # Feature MCP tools for feature/test management
 FEATURE_MCP_TOOLS = [
@@ -140,23 +143,19 @@ def create_client(project_dir: Path, model: str, yolo_mode: bool = False):
     with open(settings_file, "w") as f:
         json.dump(security_settings, f, indent=2)
 
-    print(f"Created security settings at {settings_file}")
-    print("   - Sandbox enabled (OS-level bash isolation)")
-    print(f"   - Filesystem restricted to: {project_dir.resolve()}")
-    print("   - Bash commands restricted to allowlist (see security.py)")
-    if yolo_mode:
-        print("   - MCP servers: features (database) - YOLO MODE (no Playwright)")
-    else:
-        print("   - MCP servers: playwright (browser), features (database)")
-    print("   - Project settings enabled (skills, commands, CLAUDE.md)")
-    print()
+    logger.info("Created security settings at %s", settings_file)
+    logger.debug("Sandbox enabled (OS-level bash isolation)")
+    logger.debug("Filesystem restricted to: %s", project_dir.resolve())
+    logger.debug("Bash commands restricted to allowlist")
+    logger.debug("MCP servers: %s", "features only (YOLO)" if yolo_mode else "playwright, features")
+    logger.debug("Project settings enabled (skills, commands, CLAUDE.md)")
 
     # Use system Claude CLI instead of bundled one (avoids Bun runtime crash on Windows)
     system_cli = shutil.which("claude")
     if system_cli:
-        print(f"   - Using system CLI: {system_cli}")
+        logger.info("Using system CLI: %s", system_cli)
     else:
-        print("   - Warning: System Claude CLI not found, using bundled CLI")
+        logger.warning("System Claude CLI not found, using bundled CLI")
 
     # Build MCP servers config - features is always included, playwright only in standard mode
     mcp_servers = {
