@@ -12,6 +12,15 @@ Enables developers to define application specifications and have an AI agent imp
 
 Developers who want to prototype applications using AI-assisted coding with structured feature tracking and verifiable progress.
 
+## Current Milestone: v1.1 Foundation Hardening
+
+**Goal:** Improve observability, document security posture, and add test confidence for core modules.
+
+**Target features:**
+- Structured logging with consistent formatting and log levels
+- Security blast radius documentation for resource limits and environment sanitization
+- Test coverage for agent.py, client.py, and security.py
+
 ## Requirements
 
 ### Validated
@@ -25,10 +34,9 @@ Developers who want to prototype applications using AI-assisted coding with stru
 
 ### Active
 
-- Wire resource limits helper into subprocess execution
-- Wire environment sanitization into subprocess execution
-- Structured logging framework
-- Test coverage for core modules
+- Structured logging with consistent formatting and log levels
+- Security blast radius documentation (where to apply existing helpers)
+- Test coverage for agent.py, client.py, security.py
 
 ### Out of Scope
 
@@ -88,4 +96,4 @@ See `.planning/codebase/` for detailed analysis:
 
 ---
 
-*Last updated: 2026-01-11 after v1.0 milestone*
+*Last updated: 2026-01-16 after milestone v1.1 started*

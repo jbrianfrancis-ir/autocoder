@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-11)
 
 **Core value:** Autonomous feature implementation with real-time progress tracking
-**Current focus:** Planning next milestone
+**Current focus:** v1.1 Foundation Hardening
 
 ## Current Position
 
-Phase: Milestone complete
-Plan: N/A
-Status: Ready to plan next milestone
-Last activity: 2026-01-11 - v1.0 Ralph Wiggum Alignment shipped
+Phase: Not started (run /gsd:create-roadmap)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-16 — Milestone v1.1 started
 
-Progress: v1.0 complete
+Progress: Milestone initialized
 
 ## Milestone History
 
@@ -65,4 +65,4 @@ From `.planning/codebase/CONCERNS.md`:
 
 ---
 
-*State updated: 2026-01-11 - v1.0 milestone complete*
+*State updated: 2026-01-16 - v1.1 milestone started*
