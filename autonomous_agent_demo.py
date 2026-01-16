@@ -23,6 +23,7 @@ Example Usage:
 
 import argparse
 import asyncio
+import logging
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -30,6 +31,12 @@ from dotenv import load_dotenv
 # Load environment variables from .env file (if it exists)
 # IMPORTANT: Must be called BEFORE importing other modules that read env vars at load time
 load_dotenv()
+
+# Configure logging after env vars loaded (LOG_LEVEL may be in .env)
+from logging_config import configure_logging
+configure_logging()
+
+logger = logging.getLogger(__name__)
 
 from agent import run_autonomous_agent
 from registry import DEFAULT_MODEL, get_project_path
@@ -96,6 +103,7 @@ Authentication:
 
 def main() -> None:
     """Main entry point."""
+    logger.info("Starting autonomous agent demo")
     args = parse_args()
 
     # Note: Authentication is handled by start.bat/start.sh before this script runs.
@@ -110,6 +118,7 @@ def main() -> None:
     if project_dir.is_absolute():
         # Absolute path provided - use directly
         if not project_dir.exists():
+            logger.error("Project directory does not exist: %s", project_dir)
             print(f"Error: Project directory does not exist: {project_dir}")
             return
     else:
@@ -118,9 +127,17 @@ def main() -> None:
         if registered_path:
             project_dir = registered_path
         else:
+            logger.error("Project '%s' not found in registry", project_dir_input)
             print(f"Error: Project '{project_dir_input}' not found in registry")
             print("Use an absolute path or register the project first.")
             return
+
+    logger.info(
+        "Configuration: project=%s, model=%s, yolo=%s",
+        project_dir,
+        args.model,
+        args.yolo,
+    )
 
     try:
         # Run the agent (MCP server handles feature database)
@@ -133,9 +150,11 @@ def main() -> None:
             )
         )
     except KeyboardInterrupt:
+        logger.info("Agent interrupted by user")
         print("\n\nInterrupted by user")
         print("To resume, run the same command again")
     except Exception as e:
+        logger.error("Fatal error: %s", e, exc_info=True)
         print(f"\nFatal error: {e}")
         raise
 
