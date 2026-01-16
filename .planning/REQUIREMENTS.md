@@ -20,8 +20,8 @@ Requirements for v1.1 Foundation Hardening milestone.
 
 ### Testing
 
-- [ ] **TEST-01**: agent.py has unit tests for core session loop
-- [ ] **TEST-02**: agent.py has tests for error handling paths
+- [x] **TEST-01**: agent.py has unit tests for core session loop
+- [x] **TEST-02**: agent.py has tests for error handling paths
 
 ## v2 Requirements
 
@@ -64,8 +64,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 | SEC-01 | Phase 7 | Complete |
 | SEC-02 | Phase 7 | Complete |
 | SEC-03 | Phase 7 | Complete |
-| TEST-01 | Phase 8 | Pending |
-| TEST-02 | Phase 8 | Pending |
+| TEST-01 | Phase 8 | Complete |
+| TEST-02 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 7 total

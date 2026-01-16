@@ -12,7 +12,7 @@ Autonomous coding agent system aligned with the Ralph Wiggum methodology for rel
 ## Milestones
 
 - ✅ **v1.0 MVP** - Phases 1-5 (shipped 2026-01-11)
-- 🚧 **v1.1 Foundation Hardening** - Phases 6-8 (in progress)
+- ✅ **v1.1 Foundation Hardening** - Phases 6-8 (shipped 2026-01-16)
 
 ## Phases
 
@@ -33,13 +33,13 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
 </details>
 
-### 🚧 v1.1 Foundation Hardening (In Progress)
+### ✅ v1.1 Foundation Hardening (Shipped 2026-01-16)
 
 **Milestone Goal:** Improve observability, document security posture, and add test confidence for core modules.
 
 - [x] **Phase 6: Structured Logging** (3/3 plans) - completed 2026-01-16
 - [x] **Phase 7: Security Documentation** (1/1 plan) - completed 2026-01-16
-- [ ] **Phase 8: Agent Testing** - Core agent session loop has test coverage
+- [x] **Phase 8: Agent Testing** (2/2 plans) - completed 2026-01-16
 
 ## Phase Details
 
@@ -71,7 +71,7 @@ Plans:
 Plans:
 - [x] 07-01: Security Helper Wiring Documentation
 
-### Phase 8: Agent Testing
+### Phase 8: Agent Testing ✅
 **Goal**: Core agent session loop has test coverage
 **Depends on**: Phase 7
 **Requirements**: TEST-01, TEST-02
@@ -79,10 +79,11 @@ Plans:
   1. Unit tests verify session loop handles normal flow
   2. Tests verify error handling paths (crashes, timeouts, etc.)
   3. Tests can be run with pytest
-**Plans**: TBD
+**Completed**: 2026-01-16
 
 Plans:
-- [ ] 08-01: TBD
+- [x] 08-01: Test Infrastructure and Session Tests
+- [x] 08-02: Autonomous Agent Tests
 
 ## Progress
 
@@ -98,4 +99,4 @@ Phases execute in numeric order: 6 → 7 → 8
 | 5. Sandbox Hardening | v1.0 | 2/2 | Complete | 2026-01-11 |
 | 6. Structured Logging | v1.1 | 3/3 | Complete | 2026-01-16 |
 | 7. Security Documentation | v1.1 | 1/1 | Complete | 2026-01-16 |
-| 8. Agent Testing | v1.1 | 0/? | Not started | - |
+| 8. Agent Testing | v1.1 | 2/2 | Complete | 2026-01-16 |
