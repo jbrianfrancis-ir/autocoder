@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 6 of 8 (Structured Logging)
-Plan: 03 of 03
-Status: Phase complete (pending 6-02 summary)
-Last activity: 2026-01-16 — Completed 6-03-PLAN.md (MCP Server and CLI Logging)
+Plan: 02 of 03
+Status: In progress (6-02 complete, 6-03 pending)
+Last activity: 2026-01-16 — Completed 6-02-PLAN.md (Core Agent Logging)
 
-Progress: ██░░░░░░░░ 20% (v1.1)
+Progress: ██░░░░░░░░ 24% (v1.1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11 (9 v1.0 + 2 v1.1)
-- Average duration: 2.5min (v1.1 only)
-- Total execution time: 5min (v1.1)
+- Total plans completed: 12 (9 v1.0 + 3 v1.1)
+- Average duration: 3.3min (v1.1 only)
+- Total execution time: 10min (v1.1)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | v1.0 Phases 1-5 | 9 | — | — |
-| 6-structured-logging | 2/3 | 5min | 2.5min |
+| 6-structured-logging | 2/3 | 7min | 3.5min |
 
 **Recent Trend:**
-- Last 3 plans: 2min (6-01), 3min (6-03)
+- Last 3 plans: 2min (6-01), 5min (6-02)
 - Trend: v1.1 in progress
 
 ## Milestone History
@@ -59,27 +59,27 @@ v1.1 Decisions:
 - stderr for log output (standard for servers)
 - disable_existing_loggers: False to preserve third-party loggers
 - LOG_LEVEL env var for global, LOG_LEVEL_<MODULE> for per-module override
-- MCP server configures logging independently (subprocess context)
-- CLI entry points log startup and configuration info
+- Keep user-visible output (agent responses, banners, session headers) as print()
+- Use % style formatting in logger calls to avoid eager string evaluation
 
 ### Pending Todos
 
-- Create 6-02-SUMMARY.md (work partially committed but summary missing)
+None
 
 ### Blockers/Concerns
 
 From `.planning/codebase/CONCERNS.md`:
 - Silent exception handling in WebSocket code
-- ~~No structured logging framework~~ (6-01, 6-03 complete; 6-02 needs summary)
+- ~~No structured logging framework~~ (6-01, 6-02 complete; 6-03 pending)
 - Test coverage gaps in core modules (addressed by Phase 8)
 - Resource limits/env sanitization helpers ready but not wired in (documented by Phase 7)
 
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Completed 6-03-PLAN.md
+Stopped at: Completed 6-02-PLAN.md
 Resume file: None
 
 ---
 
-*State updated: 2026-01-16 - Completed 6-03 MCP Server and CLI Logging*
+*State updated: 2026-01-16 - Completed 6-02 Core Agent Logging*
