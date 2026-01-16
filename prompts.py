@@ -9,8 +9,11 @@ Fallback chain:
 2. Base template: .claude/templates/{name}.template.md
 """
 
+import logging
 import shutil
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Base templates location (generic templates)
 TEMPLATES_DIR = Path(__file__).parent / ".claude" / "templates"
@@ -47,7 +50,7 @@ def load_prompt(name: str, project_dir: Path | None = None) -> str:
             try:
                 return project_path.read_text(encoding="utf-8")
             except (OSError, PermissionError) as e:
-                print(f"Warning: Could not read {project_path}: {e}")
+                logger.warning("Could not read %s: %s", project_path, e)
 
     # 2. Try base template
     template_path = TEMPLATES_DIR / f"{name}.template.md"
@@ -55,7 +58,7 @@ def load_prompt(name: str, project_dir: Path | None = None) -> str:
         try:
             return template_path.read_text(encoding="utf-8")
         except (OSError, PermissionError) as e:
-            print(f"Warning: Could not read {template_path}: {e}")
+            logger.warning("Could not read %s: %s", template_path, e)
 
     raise FileNotFoundError(
         f"Prompt '{name}' not found in:\n"
@@ -150,10 +153,10 @@ def scaffold_project_prompts(project_dir: Path) -> Path:
                 shutil.copy(template_path, dest_path)
                 copied_files.append(dest_name)
             except (OSError, PermissionError) as e:
-                print(f"  Warning: Could not copy {dest_name}: {e}")
+                logger.warning("Could not copy %s: %s", dest_name, e)
 
     if copied_files:
-        print(f"  Created prompt files: {', '.join(copied_files)}")
+        logger.info("Created prompt files: %s", ", ".join(copied_files))
 
     return project_prompts
 
@@ -219,10 +222,10 @@ def copy_spec_to_project(project_dir: Path) -> None:
     if project_spec.exists():
         try:
             shutil.copy(project_spec, spec_dest)
-            print("Copied app_spec.txt to project directory")
+            logger.info("Copied app_spec.txt to project directory")
             return
         except (OSError, PermissionError) as e:
-            print(f"Warning: Could not copy app_spec.txt: {e}")
+            logger.warning("Could not copy app_spec.txt: %s", e)
             return
 
-    print("Warning: No app_spec.txt found to copy to project directory")
+    logger.warning("No app_spec.txt found to copy to project directory")

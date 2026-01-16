@@ -7,11 +7,14 @@ Uses direct SQLite access for database queries.
 """
 
 import json
+import logging
 import os
 import sqlite3
 import urllib.request
 from datetime import datetime
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 WEBHOOK_URL = os.environ.get("PROGRESS_N8N_WEBHOOK_URL")
 PROGRESS_CACHE_FILE = ".progress_cache"
@@ -85,7 +88,7 @@ def count_passing_tests(project_dir: Path) -> tuple[int, int, int]:
         conn.close()
         return passing, in_progress, total
     except Exception as e:
-        print(f"[Database error in count_passing_tests: {e}]")
+        logger.error("Database error in count_passing_tests: %s", e)
         return 0, 0, 0
 
 
@@ -182,7 +185,7 @@ def send_progress_webhook(passing: int, total: int, project_dir: Path) -> None:
             )
             urllib.request.urlopen(req, timeout=5)
         except Exception as e:
-            print(f"[Webhook notification failed: {e}]")
+            logger.warning("Webhook notification failed: %s", e)
 
         # Update cache with count and passing IDs
         cache_file.write_text(
