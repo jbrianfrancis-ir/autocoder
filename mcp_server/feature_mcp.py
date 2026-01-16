@@ -18,6 +18,7 @@ Tools:
 """
 
 import json
+import logging
 import os
 import sys
 from contextlib import asynccontextmanager
@@ -30,6 +31,13 @@ from sqlalchemy.sql.expression import func
 
 # Add parent directory to path so we can import from api module
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Configure logging for subprocess context
+# MCP server runs as separate process, needs own configuration
+from logging_config import configure_logging
+configure_logging()
+
+logger = logging.getLogger(__name__)
 
 from api.database import Feature, create_database
 from api.migration import migrate_json_to_sqlite
@@ -144,11 +152,14 @@ async def server_lifespan(server: FastMCP):
     """Initialize database on startup, cleanup on shutdown."""
     global _session_maker, _engine
 
+    logger.info("Initializing MCP server for project: %s", PROJECT_DIR)
+
     # Create project directory if it doesn't exist
     PROJECT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Initialize database
     _engine, _session_maker = create_database(PROJECT_DIR)
+    logger.debug("Database initialized at %s", PROJECT_DIR / "features.db")
 
     # Run migration if needed (converts legacy JSON to SQLite)
     migrate_json_to_sqlite(PROJECT_DIR, _session_maker)
@@ -176,6 +187,7 @@ async def server_lifespan(server: FastMCP):
                     )
                     session.add(db_feature)
                 session.commit()
+                logger.info("Loaded %d features from specs directory", len(specs))
         finally:
             session.close()
 
@@ -184,6 +196,7 @@ async def server_lifespan(server: FastMCP):
     # Cleanup
     if _engine:
         _engine.dispose()
+    logger.info("MCP server shutdown, database connection closed")
 
 
 # Initialize the MCP server
@@ -193,6 +206,7 @@ mcp = FastMCP("features", lifespan=server_lifespan)
 def get_session():
     """Get a new database session."""
     if _session_maker is None:
+        logger.error("Database not initialized")
         raise RuntimeError("Database not initialized")
     return _session_maker()
 
@@ -207,6 +221,7 @@ def feature_get_stats() -> str:
     Returns:
         Markdown-formatted progress statistics for token-efficient consumption.
     """
+    logger.debug("Getting feature stats")
     session = get_session()
     try:
         total = session.query(Feature).count()
@@ -238,6 +253,7 @@ def feature_get_next() -> str:
         Markdown-formatted feature details for token-efficient consumption.
         Returns error message if all features are passing.
     """
+    logger.debug("Getting next feature to implement")
     session = get_session()
     try:
         feature = (
@@ -294,6 +310,7 @@ def feature_get_for_regression(
     Returns:
         Markdown-formatted list of features for token-efficient consumption.
     """
+    logger.debug("Getting %d random passing features for regression", limit)
     session = get_session()
     try:
         features = (
@@ -349,6 +366,7 @@ def feature_mark_passing(
         session.commit()
         session.refresh(feature)
 
+        logger.info("Feature %d marked as passing", feature_id)
         return f"Feature marked passing: **{feature.name}** (ID: {feature.id})"
     finally:
         session.close()
@@ -396,6 +414,7 @@ def feature_skip(
         session.commit()
         session.refresh(feature)
 
+        logger.info("Feature %d skipped, moved to priority %d", feature_id, new_priority)
         return f"""Feature skipped: **{feature.name}** (ID: {feature.id})
 - Old priority: {old_priority}
 - New priority: {new_priority}
@@ -436,6 +455,7 @@ def feature_mark_in_progress(
         session.commit()
         session.refresh(feature)
 
+        logger.debug("Feature %d marked in-progress", feature_id)
         return f"Feature marked in-progress: **{feature.name}** (ID: {feature.id})"
     finally:
         session.close()
@@ -467,6 +487,7 @@ def feature_clear_in_progress(
         session.commit()
         session.refresh(feature)
 
+        logger.debug("Feature %d in-progress cleared", feature_id)
         return f"In-progress cleared: **{feature.name}** (ID: {feature.id}) - returned to pending"
     finally:
         session.close()
@@ -521,9 +542,11 @@ def feature_create_bulk(
 
         session.commit()
 
+        logger.info("Created %d features in bulk", created_count)
         return json.dumps({"created": created_count}, indent=2)
     except Exception as e:
         session.rollback()
+        logger.error("Bulk create failed: %s", e)
         return json.dumps({"error": str(e)})
     finally:
         session.close()
@@ -595,6 +618,7 @@ def feature_sync_from_specs() -> str:
 
         session.commit()
 
+        logger.info("Synced specs: added=%d, updated=%d, unchanged=%d", added, updated, unchanged)
         return f"""## Specs Synced
 - Added: {added}
 - Updated: {updated}
@@ -602,6 +626,7 @@ def feature_sync_from_specs() -> str:
 - Total specs: {len(specs)}"""
     except Exception as e:
         session.rollback()
+        logger.error("Sync from specs failed: %s", e)
         return f"**Error:** {e}"
     finally:
         session.close()
