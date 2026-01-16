@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 8 of 8 (Agent Testing)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-16 — Completed Phase 7 (Security Documentation)
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-01-16 — Completed 8-01-PLAN.md (Test Infrastructure)
 
-Progress: ██████░░░░ 67% (v1.1)
+Progress: ███████░░░ 71% (v1.1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13 (9 v1.0 + 4 v1.1)
-- Average duration: 3.0min (v1.1 only)
-- Total execution time: 12min (v1.1)
+- Total plans completed: 14 (9 v1.0 + 5 v1.1)
+- Average duration: 2.8min (v1.1 only)
+- Total execution time: 14min (v1.1)
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: ██████░░░░ 67% (v1.1)
 | v1.0 Phases 1-5 | 9 | — | — |
 | 6-structured-logging | 3/3 | 10min | 3.3min |
 | 7-security-documentation | 1/1 | 2min | 2.0min |
+| 8-agent-testing | 1/4 | 2min | 2.0min |
 
 **Recent Trend:**
-- Last 3 plans: 5min (6-02), 3min (6-03), 2min (7-01)
-- Trend: Phase 7 complete
+- Last 3 plans: 3min (6-03), 2min (7-01), 2min (8-01)
+- Trend: Consistent 2-3min per plan
 
 ## Milestone History
 
@@ -64,6 +65,8 @@ v1.1 Decisions:
 - Use % style formatting in logger calls to avoid eager string evaluation
 - Primary security helper integration point: process_manager.py:258
 - ANTHROPIC_API_KEY must be explicitly re-added after get_safe_environment()
+- Use lightweight fake classes (not MagicMock) for SDK type matching in tests
+- pytest-asyncio asyncio_mode=auto for simpler async test syntax
 
 ### Pending Todos
 
@@ -80,9 +83,9 @@ From `.planning/codebase/CONCERNS.md`:
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Phase 7 complete, ready for Phase 8
+Stopped at: Completed 8-01-PLAN.md (Test Infrastructure)
 Resume file: None
 
 ---
 
-*State updated: 2026-01-16 - Phase 7 Security Documentation complete*
+*State updated: 2026-01-16 - Plan 8-01 complete, 3 plans remaining in Phase 8*
