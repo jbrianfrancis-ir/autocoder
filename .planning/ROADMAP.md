@@ -38,7 +38,7 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 **Milestone Goal:** Improve observability, document security posture, and add test confidence for core modules.
 
 - [x] **Phase 6: Structured Logging** (3/3 plans) - completed 2026-01-16
-- [ ] **Phase 7: Security Documentation** - BLAST_RADIUS.md documents how to wire in security helpers
+- [x] **Phase 7: Security Documentation** (1/1 plan) - completed 2026-01-16
 - [ ] **Phase 8: Agent Testing** - Core agent session loop has test coverage
 
 ## Phase Details
@@ -58,7 +58,7 @@ Plans:
 - [x] 06-02: Core Agent Module Logging
 - [x] 06-03: MCP Server and CLI Logging
 
-### Phase 7: Security Documentation
+### Phase 7: Security Documentation ✅
 **Goal**: BLAST_RADIUS.md fully documents how to wire in security helpers
 **Depends on**: Phase 6
 **Requirements**: SEC-01, SEC-02, SEC-03
@@ -66,10 +66,10 @@ Plans:
   1. Developer can find exact code locations for resource limit integration
   2. Developer knows which functions need environment sanitization
   3. Each helper has step-by-step wiring instructions
-**Plans**: TBD
+**Completed**: 2026-01-16
 
 Plans:
-- [ ] 07-01: TBD
+- [x] 07-01: Security Helper Wiring Documentation
 
 ### Phase 8: Agent Testing
 **Goal**: Core agent session loop has test coverage
@@ -97,5 +97,5 @@ Phases execute in numeric order: 6 → 7 → 8
 | 4. Context Optimization | v1.0 | 1/1 | Complete | 2026-01-11 |
 | 5. Sandbox Hardening | v1.0 | 2/2 | Complete | 2026-01-11 |
 | 6. Structured Logging | v1.1 | 3/3 | Complete | 2026-01-16 |
-| 7. Security Documentation | v1.1 | 0/? | Not started | - |
+| 7. Security Documentation | v1.1 | 1/1 | Complete | 2026-01-16 |
 | 8. Agent Testing | v1.1 | 0/? | Not started | - |

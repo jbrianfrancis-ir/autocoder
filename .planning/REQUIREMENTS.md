@@ -14,9 +14,9 @@ Requirements for v1.1 Foundation Hardening milestone.
 
 ### Security Documentation
 
-- [ ] **SEC-01**: BLAST_RADIUS.md documents exact integration points for resource limit helpers
-- [ ] **SEC-02**: BLAST_RADIUS.md documents where environment sanitization should be applied
-- [ ] **SEC-03**: BLAST_RADIUS.md includes "how to wire in" guidance for each helper
+- [x] **SEC-01**: BLAST_RADIUS.md documents exact integration points for resource limit helpers
+- [x] **SEC-02**: BLAST_RADIUS.md documents where environment sanitization should be applied
+- [x] **SEC-03**: BLAST_RADIUS.md includes "how to wire in" guidance for each helper
 
 ### Testing
 
@@ -61,9 +61,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 |-------------|-------|--------|
 | LOG-01 | Phase 6 | Complete |
 | LOG-02 | Phase 6 | Complete |
-| SEC-01 | Phase 7 | Pending |
-| SEC-02 | Phase 7 | Pending |
-| SEC-03 | Phase 7 | Pending |
+| SEC-01 | Phase 7 | Complete |
+| SEC-02 | Phase 7 | Complete |
+| SEC-03 | Phase 7 | Complete |
 | TEST-01 | Phase 8 | Pending |
 | TEST-02 | Phase 8 | Pending |
 
