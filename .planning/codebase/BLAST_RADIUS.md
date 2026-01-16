@@ -95,6 +95,231 @@ Provides minimal environment for subprocess execution, preventing credential lea
 - Tokens: `GITHUB_TOKEN`, `GITLAB_TOKEN`
 - SSH/GPG: `SSH_*`, `GPG_*`
 
+## How to Wire In Security Helpers
+
+This section provides step-by-step instructions for integrating the resource limits and environment sanitization helpers into subprocess calls.
+
+### 7.1 Integration Points Overview
+
+| Location | Priority | Description |
+|----------|----------|-------------|
+| `server/services/process_manager.py:258` | **HIGH** | Primary agent subprocess launch point |
+| `start.py:220` | MEDIUM | Claude CLI launch via `subprocess.run()` |
+| `start.py:372` | MEDIUM | CLI agent run via `subprocess.run()` |
+| `client.py:161-173` | MEDIUM | MCP server environment configuration |
+| `start_ui.py` | LOW | Development server launchers |
+
+**Primary target:** `server/services/process_manager.py:258` - This is where the UI launches agent subprocesses. All agent activity runs through this path, making it the highest-priority integration point.
+
+### 7.2 Wiring Resource Limits
+
+**Step 1: Add import**
+
+```python
+from security import apply_resource_limits
+```
+
+**Step 2: Locate the integration point**
+
+File: `server/services/process_manager.py`
+Line: 258 (inside `AgentProcessManager.start()` method)
+
+**Step 3: Add `preexec_fn` parameter**
+
+Before:
+```python
+self.process = subprocess.Popen(
+    cmd,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    cwd=str(self.project_dir),
+)
+```
+
+After:
+```python
+from security import apply_resource_limits
+
+self.process = subprocess.Popen(
+    cmd,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    cwd=str(self.project_dir),
+    preexec_fn=apply_resource_limits,  # Apply resource limits
+)
+```
+
+**Platform Note:** `apply_resource_limits()` is a no-op on Windows. On Linux/macOS, it sets:
+- CPU time: 300 seconds
+- Virtual memory: 1 GB
+- File size: 100 MB
+- Max processes: 50
+
+**Verification:**
+
+On Linux, verify limits are applied:
+```bash
+cat /proc/{pid}/limits | grep -E "(Max cpu time|Max address space|Max file size|Max processes)"
+```
+
+### 7.3 Wiring Environment Sanitization
+
+**Step 1: Add imports**
+
+```python
+import os
+from security import get_safe_environment
+```
+
+**Step 2: Locate the integration point**
+
+File: `server/services/process_manager.py`
+Line: 258 (inside `AgentProcessManager.start()` method)
+
+**Step 3: Build safe environment and add required keys**
+
+**CRITICAL:** The agent subprocess needs `ANTHROPIC_API_KEY` to function. The `get_safe_environment()` function intentionally excludes API keys for security. You must explicitly add it back.
+
+Before:
+```python
+self.process = subprocess.Popen(
+    cmd,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    cwd=str(self.project_dir),
+)
+```
+
+After:
+```python
+import os
+from security import get_safe_environment
+
+safe_env = get_safe_environment(project_dir=str(self.project_dir))
+safe_env["ANTHROPIC_API_KEY"] = os.environ.get("ANTHROPIC_API_KEY", "")
+
+self.process = subprocess.Popen(
+    cmd,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    cwd=str(self.project_dir),
+    env=safe_env,  # Use sanitized environment
+)
+```
+
+**Verification:**
+
+Add temporary logging to confirm sanitization:
+```python
+import logging
+logger = logging.getLogger(__name__)
+logger.debug("Safe env keys: %s", list(safe_env.keys()))
+```
+
+Expected keys: `PATH`, `LANG`, `HOME`, `TERM`, `ANTHROPIC_API_KEY`, plus any development variables present in parent environment.
+
+### 7.4 Combined Wiring (Both Helpers)
+
+For maximum security, apply both helpers together:
+
+```python
+import os
+from security import apply_resource_limits, get_safe_environment
+
+# Build sanitized environment
+safe_env = get_safe_environment(project_dir=str(self.project_dir))
+safe_env["ANTHROPIC_API_KEY"] = os.environ.get("ANTHROPIC_API_KEY", "")
+
+self.process = subprocess.Popen(
+    cmd,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    cwd=str(self.project_dir),
+    preexec_fn=apply_resource_limits,  # Resource limits (Unix only)
+    env=safe_env,  # Sanitized environment
+)
+```
+
+### 7.5 Secondary Integration Points
+
+These points are lower priority but may benefit from the helpers in specific scenarios.
+
+**`start.py:220` - Claude CLI launch**
+- Priority: MEDIUM
+- Context: Interactive spec creation via `subprocess.run(["claude", ...])`
+- Recommendation: Not critical since this is user-initiated and short-lived
+- If desired: Add `preexec_fn=apply_resource_limits`
+
+**`start.py:372` - CLI agent run**
+- Priority: MEDIUM
+- Context: Direct CLI agent launch via `subprocess.run()`
+- Recommendation: Same as above - user-initiated
+- If desired: Same pattern as Section 7.4
+
+**`client.py:161-173` - MCP server environment**
+- Priority: MEDIUM
+- Context: MCP servers receive `env=os.environ` (inherits everything)
+- Current code:
+  ```python
+  "env": {
+      **os.environ,
+      "PROJECT_DIR": str(project_dir.resolve()),
+      "PYTHONPATH": str(Path(__file__).parent.resolve()),
+  },
+  ```
+- Recommendation: Consider using `get_safe_environment()` as base, then add required vars
+- Tradeoff: MCP servers may need more environment access than agent subprocess
+- If desired:
+  ```python
+  from security import get_safe_environment
+  safe_env = get_safe_environment(project_dir=str(project_dir))
+  safe_env["ANTHROPIC_API_KEY"] = os.environ.get("ANTHROPIC_API_KEY", "")
+  safe_env["PROJECT_DIR"] = str(project_dir.resolve())
+  safe_env["PYTHONPATH"] = str(Path(__file__).parent.resolve())
+  # ... use safe_env in MCP config
+  ```
+
+**`start_ui.py` - Development servers**
+- Priority: LOW
+- Context: Local development only, launches npm/python dev servers
+- Recommendation: Not needed - development servers are trusted
+- Note: These are for local development, not production
+
+### 7.6 Testing Verification
+
+After integrating the helpers, verify everything works:
+
+**1. Resource Limits (Linux/macOS only)**
+```bash
+# Start agent via UI, get PID from logs
+cat /proc/{pid}/limits
+```
+
+Look for configured limits (300 sec CPU, 1GB memory, etc.)
+
+**2. Environment Sanitization**
+```bash
+# Add temporary logging in process_manager.py:
+logger.info("Environment keys: %s", list(safe_env.keys()))
+# Check logs for expected keys
+```
+
+Expected: `PATH`, `LANG`, `HOME`, `TERM`, `ANTHROPIC_API_KEY`, plus any `ALLOWED_ENV_VARS` present
+
+**3. Agent Functionality**
+- Start agent from UI
+- Verify agent can still:
+  - Initialize features from spec
+  - Run npm/npx commands
+  - Execute allowed bash commands
+  - Access the Claude API (requires `ANTHROPIC_API_KEY`)
+
+**4. Security Validation**
+- Verify agent does NOT have access to:
+  - `AWS_*` credentials
+  - `GITHUB_TOKEN`
+  - Other sensitive environment variables
+
 ## Blast Radius
 
 ### If Agent is Compromised, Attacker CAN:
@@ -140,11 +365,11 @@ Provides minimal environment for subprocess execution, preventing credential lea
 | Gap | Status | Mitigation |
 |-----|--------|------------|
 | No outbound network filtering | Deferred | Run in network-isolated environment for sensitive projects |
-| Resource limits not wired in | Helper ready | `apply_resource_limits()` available but not yet integrated into agent subprocess calls |
-| Environment sanitization not wired in | Helper ready | `get_safe_environment()` available but not yet integrated into agent subprocess calls |
+| Resource limits not wired in | Documented | See [Section 7.2](#72-wiring-resource-limits) for step-by-step integration instructions |
+| Environment sanitization not wired in | Documented | See [Section 7.3](#73-wiring-environment-sanitization) for step-by-step integration instructions |
 | HIGH-risk commands lack deep validation | Documented | See [COMMAND_AUDIT.md](./COMMAND_AUDIT.md) - bash/node/npm/docker have code execution capability |
-| Silent exception handling in WebSocket | Known issue | Structured logging (future) |
-| No structured logging framework | Known issue | Add in future phase |
+| Silent exception handling in WebSocket | Known issue | Structured logging implemented (Phase 6) |
+| No structured logging framework | Resolved | Implemented in Phase 6 - see logging configuration in `logging_config.py` |
 
 ## Recommendations
 
@@ -171,6 +396,9 @@ Provides minimal environment for subprocess execution, preventing credential lea
 | 2026-01-11 | Added environment sanitization helper (Section 6) |
 | 2026-01-11 | Added reference to COMMAND_AUDIT.md |
 | 2026-01-11 | Updated known gaps with helper status |
+| 2026-01-16 | Added "How to Wire In Security Helpers" section (Section 7) |
+| 2026-01-16 | Updated known gaps: resource limits and env sanitization now documented |
+| 2026-01-16 | Updated known gaps: structured logging resolved (Phase 6) |
 
 ---
 
