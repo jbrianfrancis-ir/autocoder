@@ -12,43 +12,36 @@ Enables developers to define application specifications and have an AI agent imp
 
 Developers who want to prototype applications using AI-assisted coding with structured feature tracking and verifiable progress.
 
-## Current Milestone: v1.1 Foundation Hardening
-
-**Goal:** Improve observability, document security posture, and add test confidence for core modules.
-
-**Target features:**
-- Structured logging with consistent formatting and log levels
-- Security blast radius documentation for resource limits and environment sanitization
-- Test coverage for agent.py, client.py, and security.py
-
 ## Requirements
 
 ### Validated
 
-- Spec-driven architecture with hybrid spec-database pattern - v1.0
-- Deterministic fresh-start loop with structured progress file - v1.0
-- Backpressure validation gates before commits - v1.0
-- Markdown over JSON for token efficiency - v1.0
-- Sandbox hardening with CORS, symlink checks, blast radius docs - v1.0
-- Resource limits and environment sanitization helpers - v1.0
+- Spec-driven architecture with hybrid spec-database pattern — v1.0
+- Deterministic fresh-start loop with structured progress file — v1.0
+- Backpressure validation gates before commits — v1.0
+- Markdown over JSON for token efficiency — v1.0
+- Sandbox hardening with CORS, symlink checks, blast radius docs — v1.0
+- Resource limits and environment sanitization helpers — v1.0
+- ✓ Structured logging with consistent formatting and log levels — v1.1
+- ✓ Security blast radius documentation (where to apply existing helpers) — v1.1
+- ✓ Test coverage for agent.py session loop and error handling — v1.1
 
 ### Active
 
-- Structured logging with consistent formatting and log levels
-- Security blast radius documentation (where to apply existing helpers)
-- Test coverage for agent.py, client.py, security.py
+(None — planning next milestone)
 
 ### Out of Scope
 
-- Multi-project parallel execution - focus on single-project reliability first
-- Cloud deployment - local development tool
+- Multi-project parallel execution — focus on single-project reliability first
+- Cloud deployment — local development tool
+- client.py and security.py test coverage — deferred to v2
 
 ## Current State
 
-**Version:** v1.0 Ralph Wiggum Alignment (shipped 2026-01-11)
+**Version:** v1.1 Foundation Hardening (shipped 2026-01-16)
 
 **Codebase:**
-- 8,892 lines of Python
+- 9,598 lines of Python
 - Tech stack: Python, FastAPI, React, SQLite, Claude Agent SDK
 
 **Architecture:**
@@ -57,6 +50,12 @@ Developers who want to prototype applications using AI-assisted coding with stru
 - Feature MCP server for feature management
 - Playwright MCP for browser automation
 - YOLO mode for rapid prototyping
+
+**v1.1 Additions:**
+- Structured logging with dictConfig across all modules
+- LOG_LEVEL and LOG_LEVEL_<MODULE> environment variables
+- Security helper wiring guide in BLAST_RADIUS.md
+- 13 unit tests for agent.py with pytest-asyncio
 
 **Ralph Wiggum Patterns Implemented:**
 - Specs as source of truth (`specs/FILENAME.md` per feature)
@@ -75,7 +74,12 @@ Developers who want to prototype applications using AI-assisted coding with stru
 | Validation gates as STEP 8 | Enforces quality before any commit | Good |
 | Markdown MCP responses | Token efficiency (~40% reduction) | Good |
 | Localhost-only CORS | Security without complexity | Good |
-| Resource/env helpers not wired in | Avoid scope creep, helpers ready when needed | Pending |
+| Resource/env helpers not wired in | Avoid scope creep, helpers ready when needed | Documented v1.1 |
+| Python stdlib dictConfig | No external dependencies for logging | Good |
+| stderr for log output | Standard for server applications | Good |
+| LOG_LEVEL env vars for configuration | Runtime log level control without code changes | Good |
+| Fake classes over MagicMock | SDK type() matching in agent.py requires real classes | Good |
+| pytest-asyncio asyncio_mode=auto | Simpler async test syntax | Good |
 
 ## Definitive Reference
 
@@ -96,4 +100,4 @@ See `.planning/codebase/` for detailed analysis:
 
 ---
 
-*Last updated: 2026-01-16 after milestone v1.1 started*
+*Last updated: 2026-01-18 after v1.1 milestone*

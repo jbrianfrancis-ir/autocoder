@@ -33,62 +33,18 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
 </details>
 
-### ✅ v1.1 Foundation Hardening (Shipped 2026-01-16)
+<details>
+<summary>✅ v1.1 Foundation Hardening (Phases 6-8) — SHIPPED 2026-01-16</summary>
 
-**Milestone Goal:** Improve observability, document security posture, and add test confidence for core modules.
+- [x] **Phase 6: Structured Logging** (3/3 plans) — completed 2026-01-16
+- [x] **Phase 7: Security Documentation** (1/1 plan) — completed 2026-01-16
+- [x] **Phase 8: Agent Testing** (2/2 plans) — completed 2026-01-16
 
-- [x] **Phase 6: Structured Logging** (3/3 plans) - completed 2026-01-16
-- [x] **Phase 7: Security Documentation** (1/1 plan) - completed 2026-01-16
-- [x] **Phase 8: Agent Testing** (2/2 plans) - completed 2026-01-16
+See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 
-## Phase Details
-
-### Phase 6: Structured Logging ✅
-**Goal**: Consistent, configurable logging across all Python modules
-**Depends on**: Phase 5 (v1.0 complete)
-**Requirements**: LOG-01, LOG-02
-**Success Criteria** (what must be TRUE):
-  1. All log messages include timestamp, level, module name, and message
-  2. Log level can be changed via environment variable or config
-  3. Different modules can have different log levels when needed
-**Completed**: 2026-01-16
-
-Plans:
-- [x] 06-01: Logging Configuration Foundation
-- [x] 06-02: Core Agent Module Logging
-- [x] 06-03: MCP Server and CLI Logging
-
-### Phase 7: Security Documentation ✅
-**Goal**: BLAST_RADIUS.md fully documents how to wire in security helpers
-**Depends on**: Phase 6
-**Requirements**: SEC-01, SEC-02, SEC-03
-**Success Criteria** (what must be TRUE):
-  1. Developer can find exact code locations for resource limit integration
-  2. Developer knows which functions need environment sanitization
-  3. Each helper has step-by-step wiring instructions
-**Completed**: 2026-01-16
-
-Plans:
-- [x] 07-01: Security Helper Wiring Documentation
-
-### Phase 8: Agent Testing ✅
-**Goal**: Core agent session loop has test coverage
-**Depends on**: Phase 7
-**Requirements**: TEST-01, TEST-02
-**Success Criteria** (what must be TRUE):
-  1. Unit tests verify session loop handles normal flow
-  2. Tests verify error handling paths (crashes, timeouts, etc.)
-  3. Tests can be run with pytest
-**Completed**: 2026-01-16
-
-Plans:
-- [x] 08-01: Test Infrastructure and Session Tests
-- [x] 08-02: Autonomous Agent Tests
+</details>
 
 ## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 6 → 7 → 8
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
